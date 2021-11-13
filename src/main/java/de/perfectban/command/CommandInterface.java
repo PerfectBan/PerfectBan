@@ -16,4 +16,6 @@ public interface CommandInterface
     HashMap<Integer, List<String>> getTabCompletions(CommandSender commandSender, String[] typedArguments);
 
     String getDescription();
+
+    boolean isPlayerOnly();
 }
