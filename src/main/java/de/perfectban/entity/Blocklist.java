@@ -3,7 +3,7 @@ package de.perfectban.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "mute")
+@Table(name = "blocklist")
 public class Blocklist {
     @Id
     @GeneratedValue
