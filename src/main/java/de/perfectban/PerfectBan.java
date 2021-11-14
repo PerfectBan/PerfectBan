@@ -1,15 +1,12 @@
 package de.perfectban;
 
+import de.perfectban.command.CommandListener;
 import de.perfectban.command.CommandManager;
 import de.perfectban.command.ban.BanCommand;
 import de.perfectban.entity.Ban;
 import de.perfectban.event.bungeecord.PlayerJoinListener;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
@@ -47,6 +44,7 @@ public class PerfectBan extends Plugin {
 
         // setup listeners
         this.getProxy().getPluginManager().registerListener(this, new PlayerJoinListener());
+        this.getProxy().getPluginManager().registerListener(this, new CommandListener());
     }
 
     @Override

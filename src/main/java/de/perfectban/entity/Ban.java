@@ -12,9 +12,6 @@ public class Ban
     @Column(name="id")
     private int id;
 
-    @Column(name="token")
-    private String token;
-
     @Column(name="uuid")
     private String uuid;
 
@@ -44,15 +41,6 @@ public class Ban
 
         public Ban setId(int id) {
             this.id = id;
-            return this;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public Ban setToken(String token) {
-            this.token = token;
             return this;
         }
 
