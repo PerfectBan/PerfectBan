@@ -7,7 +7,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "mute")
-public class Mute {
+public class Mute
+{
     @Id
     @GeneratedValue
     @Column(name = "id")

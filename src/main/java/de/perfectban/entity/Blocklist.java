@@ -4,7 +4,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "blocklist")
-public class Blocklist {
+public class Blocklist
+{
     @Id
     @GeneratedValue
     @Column(name = "id")
