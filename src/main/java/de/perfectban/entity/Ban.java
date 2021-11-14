@@ -1,14 +1,14 @@
 package de.perfectban.entity;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.Date;
 
-@Entity
-@Table(name = "Ban")
+@Entity @Table(name = "ban")
 public class Ban
 {
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     @Column(name="id")
     private int id;
 
@@ -24,50 +24,58 @@ public class Ban
     @Column(name="until")
     private Date until;
 
-    @Column(name="lifetime")
+    @Column(name="lifetime",columnDefinition="TINYINT")
+    @Type(type="org.hibernate.type.NumericBooleanType")
     private boolean lifetime;
 
-    @Column(name="automatic")
+    @Column(name="automatic",columnDefinition="TINYINT")
+    @Type(type="org.hibernate.type.NumericBooleanType")
     private boolean automatic;
+
+    @Column(name="active",columnDefinition="TINYINT")
+    @Type(type="org.hibernate.type.NumericBooleanType")
+    private boolean active;
+
+    public Ban() {}
 
     public int getId() {
         return id;
     }
 
-    public Ban setId(int id) {
-        this.id = id;
-        return this;
-    }
+        public Ban setId(int id) {
+            this.id = id;
+            return this;
+        }
 
-    public String getToken() {
-        return token;
-    }
+        public String getToken() {
+            return token;
+        }
 
-    public Ban setToken(String token) {
-        this.token = token;
-        return this;
-    }
+        public Ban setToken(String token) {
+            this.token = token;
+            return this;
+        }
 
-    public String getUuid() {
-        return uuid;
-    }
+        public String getUuid() {
+            return uuid;
+        }
 
-    public Ban setUuid(String uuid) {
-        this.uuid = uuid;
-        return this;
-    }
+        public Ban setUuid(String uuid) {
+            this.uuid = uuid;
+            return this;
+        }
 
-    public String getReason() {
-        return reason;
-    }
+        public String getReason() {
+            return reason;
+        }
 
-    public Ban setReason(String reason) {
-        this.reason = reason;
-        return this;
-    }
+        public Ban setReason(String reason) {
+            this.reason = reason;
+            return this;
+        }
 
-    public Date getUntil() {
-        return until;
+        public Date getUntil() {
+            return until;
     }
 
     public Ban setUntil(Date until) {
@@ -90,6 +98,15 @@ public class Ban
 
     public Ban setAutomatic(boolean automatic) {
         this.automatic = automatic;
+        return this;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public Ban setActive(boolean active) {
+        this.active = active;
         return this;
     }
 }

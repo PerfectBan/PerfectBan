@@ -1,36 +1,52 @@
 package de.perfectban;
 
+import de.perfectban.command.CommandManager;
+import de.perfectban.command.ban.BanCommand;
 import de.perfectban.entity.Ban;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
+import de.perfectban.event.bungeecord.PlayerJoinListener;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 
 public class PerfectBan extends Plugin {
 
     public static final String BASE_PACKAGE = "de.perfectban";
 
     private static PerfectBan instance;
+
+    private CommandManager commandManager;
     private EntityManager entityManager;
+    private SessionFactory sessionFactory;
 
     @Override
     public void onEnable() {
         instance = this;
 
         // setup hibernate
-        this.entityManager = Persistence.createEntityManagerFactory(BASE_PACKAGE).createEntityManager();
+        // todo: use configuration to set those values and catch any errors (display them user friendly)
+        Configuration configuration = new Configuration()
+                .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
+                .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
+                .setProperty("hibernate.connection.url", "jdbc:mysql://host:port/database")
+                .setProperty("hibernate.connection.username", "username")
+                .setProperty("hibernate.connection.password", "password")
+                .addAnnotatedClass(Ban.class);
 
-        // todo: remove
-        Ban ban = PerfectBan.getInstance().getEntityManager().find(Ban.class, 1);
+        sessionFactory = configuration.buildSessionFactory();
+        entityManager = sessionFactory.createEntityManager();
 
-        if (ban == null) {
-            ProxyServer.getInstance().broadcast(new TextComponent("§cBan not found"));
-            return;
-        }
+        // setup commands
+        commandManager = new CommandManager();
+        commandManager.addCommand(new BanCommand());
 
-        ProxyServer.getInstance().broadcast(new TextComponent(ban.getReason()));
+        // setup listeners
+        this.getProxy().getPluginManager().registerListener(this, new PlayerJoinListener());
     }
 
     @Override
@@ -38,11 +54,19 @@ public class PerfectBan extends Plugin {
         
     }
 
+    public EntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public SessionFactory getSessionFactory() {
+        return sessionFactory;
+    }
+
     public static PerfectBan getInstance() {
         return instance;
     }
 
-    public EntityManager getEntityManager() {
-        return entityManager;
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 }

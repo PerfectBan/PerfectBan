@@ -1,12 +1,11 @@
 package de.perfectban.command.ban;
 
-import de.perfectban.PerfectBan;
 import de.perfectban.command.CommandInterface;
-import de.perfectban.entity.Ban;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.apache.commons.cli.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,17 +13,56 @@ public class BanCommand implements CommandInterface
 {
     @Override
     public void onCommand(CommandSender commandSender, String[] args, String label) {
-        
+        String action = args[0];
+
+        Options options = new Options();
+        CommandLineParser parser = new BasicParser();
+
+        options.addOption(new Option("r", "reason", false, "The reason for the ban"));
+        options.addOption(new Option("t", "time", false, "The time a player will be banned"));
+        options.addOption(new Option("lt", "lifetime", false, "Ban forever"));
+        options.addOption(new Option("ip", "ipban", false, "IP-Ban"));
+
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+
+            String reason = commandLine.getOptionValue("r");
+            String time = commandLine.getOptionValue("t");
+            boolean lifetime = commandLine.hasOption("lt");
+            boolean ip = commandLine.hasOption("ip");
+
+            // todo: remove debug
+            commandSender.sendMessage(new TextComponent(String.format(
+                    "r: %s, t: %s, lifetime: %s, ip: %s",
+                    reason,
+                    time,
+                    lifetime ? "yes" : "no",
+                    ip ? "yes" : "no"
+            )));
+
+            if (action.equalsIgnoreCase("info")) {
+
+            } else if (action.equalsIgnoreCase("delete")) {
+
+            } else if (action.equalsIgnoreCase("change")) {
+
+            } else {
+                // this should be username or random
+            }
+        } catch (ParseException exception) {
+            // todo: error
+            commandSender.sendMessage(new TextComponent("todo: error"));
+        }
     }
 
     @Override
     public List<String> getAliases() {
-        return null;
+        return Collections.singletonList("perfectban"); // todo: configurable
     }
 
     @Override
     public String getPermission() {
-        return null;
+        return "perfectban.ban.command.permission"; // todo: configurable
     }
 
     @Override
@@ -34,7 +72,7 @@ public class BanCommand implements CommandInterface
 
     @Override
     public String getDescription() {
-        return null;
+        return "perfectban.ban.command.description"; // todo: configurable;
     }
 
     @Override

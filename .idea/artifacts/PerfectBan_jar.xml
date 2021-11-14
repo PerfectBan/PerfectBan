@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="PerfectBan:jar">
+    <output-path>$USER_HOME$/Desktop/BungeeCord/plugins</output-path>
+    <root id="archive" name="PerfectBan.jar">
+      <element id="module-output" name="PerfectBan" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/plugin.yml" />
+      <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/bungee.yml" />
+    </root>
+  </artifact>
+</component>
