@@ -1,6 +1,8 @@
 package de.perfectban.command.ban;
 
+import de.perfectban.PerfectBan;
 import de.perfectban.command.CommandInterface;
+import de.perfectban.entity.Ban;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.cli.*;
@@ -41,7 +43,15 @@ public class BanCommand implements CommandInterface
             )));
 
             if (action.equalsIgnoreCase("info")) {
+                Long id = Long.valueOf(args[1]);
+                Ban ban = PerfectBan.getInstance().getEntityManager().find(Ban.class, id);
 
+                if (ban == null) {
+                    // todo: send message
+                    return;
+                }
+
+                // todo: send success message
             } else if (action.equalsIgnoreCase("delete")) {
 
             } else if (action.equalsIgnoreCase("change")) {
