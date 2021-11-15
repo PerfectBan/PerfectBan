@@ -5,6 +5,7 @@ import org.hibernate.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class MuteRepository
                 .getResultList();
     }
 
-    public Mute createMute(UUID uuid, String reason, String match, Date until, boolean lifetime, boolean automatic) {
+    public Mute createMute(UUID uuid, String reason, String matched, Timestamp until, boolean lifetime, boolean automatic) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -38,7 +39,7 @@ public class MuteRepository
 
         mute.setUuid(uuid.toString());
         mute.setReason(reason);
-        mute.setMatch(match);
+        mute.setMatched(matched);
         mute.setUntil(until);
         mute.setLifetime(lifetime);
         mute.setAutomatic(automatic);

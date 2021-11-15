@@ -9,30 +9,30 @@ import java.util.Date;
 @Entity @Table(name = "ban")
 public class Ban
 {
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
 
-    @Column(name="uuid")
+    @Column(name = "uuid", columnDefinition = "varchar(64) not null")
     private String uuid;
 
-    @Column(name="reason")
+    @Column(name = "reason", columnDefinition = "text not null")
     private String reason;
 
-    @Column(name="until")
+    @Column(name = "until", columnDefinition = "timestamp null default null")
     private Timestamp until;
 
-    @Column(name="lifetime",columnDefinition="TINYINT")
-    @Type(type="org.hibernate.type.NumericBooleanType")
+    @Column(name = "lifetime", columnDefinition = "boolean default false")
     private boolean lifetime;
 
-    @Column(name="automatic",columnDefinition="TINYINT")
-    @Type(type="org.hibernate.type.NumericBooleanType")
+    @Column(name = "automatic", columnDefinition = "boolean default false")
     private boolean automatic;
 
-    @Column(name="active",columnDefinition="TINYINT")
-    @Type(type="org.hibernate.type.NumericBooleanType")
+    @Column(name = "active", columnDefinition = "boolean default true")
     private boolean active;
+
+    @Column(name = "created", columnDefinition = "timestamp default CURRENT_TIMESTAMP()")
+    private Timestamp created;
 
     public Ban() {}
 
@@ -96,6 +96,15 @@ public class Ban
 
     public Ban setActive(boolean active) {
         this.active = active;
+        return this;
+    }
+
+    public Timestamp getCreated() {
+        return created;
+    }
+
+    public Ban setCreated(Timestamp created) {
+        this.created = created;
         return this;
     }
 }

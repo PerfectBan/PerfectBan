@@ -3,6 +3,7 @@ package de.perfectban.entity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
@@ -14,29 +15,29 @@ public class Mute
     @Column(name = "id")
     private int id;
 
-    @Column(name = "uuid")
+    @Column(name = "uuid", columnDefinition = "varchar(64) not null")
     private String uuid;
 
-    @Column(name = "reason")
+    @Column(name = "reason", columnDefinition = "text not null")
     private String reason;
 
-    @Column(name = "match")
-    private String match;
+    @Column(name = "matched", columnDefinition = "text null")
+    private String matched;
 
-    @Column(name = "until")
-    private Date until;
+    @Column(name = "until", columnDefinition = "timestamp null default null")
+    private Timestamp until;
 
-    @Column(name = "lifetime", columnDefinition = "TINYINT")
-    @Type(type = "org.hibernate.type.NumericBooleanType")
+    @Column(name = "lifetime", columnDefinition = "boolean default false")
     private boolean lifetime;
 
-    @Column(name = "automatic", columnDefinition = "TINYINT")
-    @Type(type = "org.hibernate.type.NumericBooleanType")
+    @Column(name = "automatic", columnDefinition = "boolean default false")
     private boolean automatic;
 
-    @Column(name = "active", columnDefinition = "TINYINT")
-    @Type(type = "org.hibernate.type.NumericBooleanType")
+    @Column(name = "active", columnDefinition = "boolean default false")
     private boolean active;
+
+    @Column(name = "created", columnDefinition = "timestamp default CURRENT_TIMESTAMP()")
+    private Timestamp created;
 
     public Mute() {}
 
@@ -67,20 +68,20 @@ public class Mute
         return this;
     }
 
-    public String getMatch() {
-        return match;
+    public String getMatched() {
+        return matched;
     }
 
-    public Mute setMatch(String match) {
-        this.match = match;
+    public Mute setMatched(String matched) {
+        this.matched = matched;
         return this;
     }
 
-    public Date getUntil() {
+    public Timestamp getUntil() {
         return until;
     }
 
-    public Mute setUntil(Date until) {
+    public Mute setUntil(Timestamp until) {
         this.until = until;
         return this;
     }
@@ -109,6 +110,15 @@ public class Mute
 
     public Mute setActive(boolean active) {
         this.active = active;
+        return this;
+    }
+
+    public Timestamp getCreated() {
+        return created;
+    }
+
+    public Mute setCreated(Timestamp created) {
+        this.created = created;
         return this;
     }
 }

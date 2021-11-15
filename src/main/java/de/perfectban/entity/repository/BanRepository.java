@@ -54,6 +54,29 @@ public class BanRepository
         return ban;
     }
 
+    public void editBan(int id, String reason, Timestamp until, Boolean lifetime) {
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        Ban ban = getBan(id);
+
+        transaction.begin();
+
+        if (reason != null) {
+            ban.setReason(reason);
+        }
+
+        if (lifetime != null) {
+            ban.setLifetime(lifetime);
+        }
+
+        if (until != null) {
+            ban.setUntil(until);
+        }
+
+        transaction.commit();
+
+    }
+
     public void deleteBan(int id) {
         Ban ban = getBan(id);
 

@@ -6,6 +6,7 @@ import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
 import de.perfectban.entity.repository.BanRepository;
+import de.perfectban.util.PlaceholderManager;
 import de.perfectban.util.TimeManager;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -63,7 +64,10 @@ public class BanCommand extends Command implements CommandInterface
                     return;
                 }
 
-                // todo: send player information
+                String message = ConfigManager.getConfig(ConfigType.MESSAGES)
+                        .getString("perfectban.ban.command.info");
+
+                commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(message, bans.get(0))));
             } else if (args.length >= 2 && action.equalsIgnoreCase("delete")) {
                 String player = args[1];
                 UUID uuid = UUID.randomUUID(); // todo: UUID Fetcher
@@ -89,13 +93,47 @@ public class BanCommand extends Command implements CommandInterface
 
                 // broadcast to moderators
                 if (ConfigManager.getConfig(ConfigType.SETTINGS).getBoolean("useBroadcast")) {
-                    // todo: send broadcast message
+                    // todo: escape placeholders
+                    commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                            .getString("perfectban.ban.command.broadcast_ban")));
                 }
 
                 commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
                     .getString("perfectban.ban.command.player_unbanned")));
             } else if (args.length >= 2 && action.equalsIgnoreCase("change")) {
-                // todo: change ban
+                String player = args[1];
+                UUID uuid = UUID.randomUUID(); // todo: UUID Fetcher
+
+                if (uuid == null) {
+                    commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                            .getString("perfectban.error.player_not_found")));
+                    return;
+                }
+
+                List<Ban> bans = repository.getBans(uuid);
+
+                if (bans.isEmpty()) {
+                    commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                            .getString("perfectban.error.player_not_fined")));
+                    return;
+                }
+
+                Ban ban = bans.get(0);
+
+                // calculate until
+                long diff = TimeManager.convertToMillis(time);
+                Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
+
+                // soft delete ban
+                repository.editBan(ban.getId(), reason, until, lifetime);
+
+                // broadcast to moderators
+                if (ConfigManager.getConfig(ConfigType.SETTINGS).getBoolean("useBroadcast")) {
+                    // todo: send broadcast message
+                }
+
+                commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                        .getString("perfectban.ban.command.ban_edited")));
             } else if (args.length >= 2) {
                 // this should be username or random
                 String player = args[1];
@@ -135,8 +173,8 @@ public class BanCommand extends Command implements CommandInterface
                 commandSender.sendMessage(new TextComponent(getDescription()));
             }
         } catch (ParseException exception) {
-            // todo: error
-            commandSender.sendMessage(new TextComponent("todo: error"));
+            commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                    .getString("perfectban.error.internal")));
         }
     }
 
