@@ -1,3 +1,5 @@
-"perfectban.ban.command.description": "Hello World"
-"perfectban.ban.ban_message": "You are banned"
-"perfectban.ban.command.permission": "permission"
+perfectban:
+  ban:
+    ban_message: "You are banned"
+    command:
+      description: "Hello World"
