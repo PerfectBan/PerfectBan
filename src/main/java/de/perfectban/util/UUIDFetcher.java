@@ -28,6 +28,11 @@ public class UUIDFetcher {
                         .send()
                         .getAsString();
 
+                if(trimmedUUID.equalsIgnoreCase("Player not found !")){
+                    callback.accept(null);
+                    return;
+                }
+
                 UUID uuid = fromTrimmed(trimmedUUID);
 
                 CACHE.put(name.toUpperCase(), uuid);
