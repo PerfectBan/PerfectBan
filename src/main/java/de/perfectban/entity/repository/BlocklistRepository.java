@@ -28,7 +28,7 @@ public class BlocklistRepository
 
         // todo: check if type is valid
 
-        blocklist.setMatch(match);
+        blocklist.setMatched(match);
         blocklist.setType(type);
 
         entityManager.persist(blocklist);

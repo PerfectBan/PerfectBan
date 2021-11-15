@@ -51,7 +51,6 @@ public class MuteRepository
         return mute;
     }
 
-    // todo: soft delete?
     public boolean deleteMute(int id) {
         Mute mute = getMute(id);
 
@@ -59,7 +58,11 @@ public class MuteRepository
             return false;
         }
 
-        entityManager.remove(mute);
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        transaction.begin();
+        mute.setActive(false);
+        transaction.commit();
         return true;
     }
 }

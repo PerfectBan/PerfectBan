@@ -11,8 +11,8 @@ public class Blocklist
     @Column(name = "id")
     private int id;
 
-    @Column(name = "match")
-    private String match;
+    @Column(name = "matched")
+    private String matched;
 
     @Column(name = "type")
     private String type;
@@ -28,12 +28,12 @@ public class Blocklist
         return this;
     }
 
-    public String getMatch() {
-        return match;
+    public String getMatched() {
+        return matched;
     }
 
-    public Blocklist setMatch(String match) {
-        this.match = match;
+    public Blocklist setMatched(String match) {
+        this.matched = match;
         return this;
     }
 
