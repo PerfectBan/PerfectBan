@@ -1,0 +1,5 @@
+perfectban:
+  ban:
+    ban_message: "You are banned"
+    command:
+      description: "Hello World"
