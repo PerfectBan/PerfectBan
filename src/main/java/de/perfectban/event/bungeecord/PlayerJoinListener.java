@@ -9,15 +9,14 @@ import de.perfectban.util.PlaceholderManager;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
-import javax.persistence.EntityTransaction;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerJoinListener implements Listener {
+public class PlayerJoinListener implements Listener
+{
     private final BanRepository repository;
 
     public PlayerJoinListener() {
@@ -26,9 +25,6 @@ public class PlayerJoinListener implements Listener {
 
     @EventHandler
     public void onJoin(LoginEvent event) {
-        Configuration configuration = ConfigManager.getConfig(ConfigType.MESSAGES);
-        assert configuration != null;
-
         UUID uuid = event.getConnection().getUniqueId();
         Date now = new Date();
 
@@ -49,7 +45,9 @@ public class PlayerJoinListener implements Listener {
         }
 
         String banMessage = PlaceholderManager.replaceBanPlaceholders(
-                configuration.getString("perfectban.ban.ban_message"), ban);
+            ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.ban_message"),
+            ban
+        );
 
         // disallow player from joining
         event.setCancelled(true);
