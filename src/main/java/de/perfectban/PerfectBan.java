@@ -46,8 +46,6 @@ public class PerfectBan extends Plugin {
         // setup commands
 
         // setup listeners
-
-        System.out.println(ConfigManager.getString(ConfigType.CONFIG, "useBroadcast") + "HAHAHHAHAHAHAHAHAHHAHAHAHAHAHAHAHAHHAHHAHAHAHAHAHHAH");
     }
 
     @Override
