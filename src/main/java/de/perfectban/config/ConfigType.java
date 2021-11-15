@@ -2,9 +2,9 @@ package de.perfectban.config;
 
 public enum ConfigType {
 
-    MESSAGES("messages.yml", "config/messages.yml", "messages"),
-    SETTINGS("settings.yml", "config/settings.yml", "settings"),
-    PERMISSIONS("permissions.yml", "config/permissions.yml", "permissions");
+    MESSAGES("messages.yml", "messages.yml", "messages"),
+    CONFIG("config.yml", "config.yml", "config"),
+    PERMISSIONS("permissions.yml", "permissions.yml", "permissions");
 
     private String path, name, defaults;
 
