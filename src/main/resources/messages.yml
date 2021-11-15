@@ -1,5 +1,17 @@
 perfectban:
+  prefix: "§b§lPerfectBan §8|§f"
   ban:
-    ban_message: "You are banned"
+    ban_message: "§cYou were banned from §4§lexample.com§c!\n\n§f§lID #{ID}\n\n§b§lREASON: §f{REASON}\n§b§lTIME LEFT: §f{TIME}\n\n§eFor more information visit §b§lexample.com/unban"
     command:
+      templates:
+        info: "{PREFIX} Information about {PLAYER}\n{PREFIX} Id: §e{ID}\n{PREFIX} Reason: §e{REASON}\n{PREFIX} Until: §e{UNTIL}"
       description: "Hello World"
+      broadcast:
+        created: "Player {PLAYER} was banned for {REASON} from {BANNED_BY}"
+        change: "Ban with id {ID} ({PLAYER}) was changed by {BANNED_BY}"
+        delete: "Ban with id {ID} ({PLAYER}) was deleted by {BANNED_BY}"
+  error:
+    player_not_found: "This player has not been found"
+    ban:
+      player_not_banned: "This player is not banned"
+      player_banned: "This player is already banned"

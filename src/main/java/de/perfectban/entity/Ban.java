@@ -1,10 +1,7 @@
 package de.perfectban.entity;
 
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity @Table(name = "ban")
 public class Ban
