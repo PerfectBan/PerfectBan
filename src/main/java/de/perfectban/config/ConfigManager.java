@@ -9,10 +9,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
 
 public class ConfigManager {
 
+    private static final HashMap<ConfigType, Configuration> configurations = new HashMap<>();
+
     public static Configuration getConfig(ConfigType configType) {
+//        if (configurations.containsKey(configType)) {
+//            return configurations.get(configType);
+//        }
+
         try {
             File file = new File(PerfectBan.getInstance().getDataFolder().getPath(), configType.getPath());
 
@@ -26,7 +33,11 @@ public class ConfigManager {
                 }
             }
 
-            return ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+            Configuration configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+
+            configurations.put(configType, configuration);
+
+            return configuration;
         } catch (IOException e) {
             e.printStackTrace();
         }

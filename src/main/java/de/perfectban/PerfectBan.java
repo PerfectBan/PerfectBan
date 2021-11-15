@@ -1,7 +1,11 @@
 package de.perfectban;
 
 import de.perfectban.command.ban.BanCommand;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
+import de.perfectban.entity.Blocklist;
+import de.perfectban.entity.Mute;
 import de.perfectban.event.bungeecord.PlayerJoinListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -18,6 +22,7 @@ public class PerfectBan extends Plugin {
 
     private EntityManager entityManager;
     private SessionFactory sessionFactory;
+    private ConfigManager configManager;
 
     @Override
     public void onEnable() {
@@ -28,19 +33,22 @@ public class PerfectBan extends Plugin {
         Configuration configuration = new Configuration()
                 .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
                 .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
-                .setProperty("hibernate.connection.url", "jdbc:mysql://host:port/database")
-                .setProperty("hibernate.connection.username", "username")
-                .setProperty("hibernate.connection.password", "password")
-                .addAnnotatedClass(Ban.class);
+                .setProperty("hibernate.connection.url", "jdbc:mysql://database.tschoerner.cloud:3306/perfectban")
+                .setProperty("hibernate.connection.username", "perfectban")
+                .setProperty("hibernate.connection.password", "NX093ZCCbO6qAwbZ")
+                .addAnnotatedClass(Ban.class)
+                .addAnnotatedClass(Mute.class)
+                .addAnnotatedClass(Blocklist.class);
 
         sessionFactory = configuration.buildSessionFactory();
         entityManager = sessionFactory.createEntityManager();
 
+        // setup configs
+        this.getDataFolder().mkdirs();
+        configManager = new ConfigManager();
+
         // setup commands
-        ProxyServer.getInstance().getPluginManager().registerCommand(
-            this,
-            new BanCommand("perfectban", "perfectban.permission")
-        );
+        this.getProxy().getPluginManager().registerCommand(this, new BanCommand("perfectban"));
 
         // setup listeners
         this.getProxy().getPluginManager().registerListener(this, new PlayerJoinListener());
@@ -51,6 +59,10 @@ public class PerfectBan extends Plugin {
         
     }
 
+    public static PerfectBan getInstance() {
+        return instance;
+    }
+
     public EntityManager getEntityManager() {
         return entityManager;
     }
@@ -59,7 +71,7 @@ public class PerfectBan extends Plugin {
         return sessionFactory;
     }
 
-    public static PerfectBan getInstance() {
-        return instance;
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 }

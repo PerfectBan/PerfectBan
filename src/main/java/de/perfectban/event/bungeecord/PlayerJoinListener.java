@@ -1,22 +1,23 @@
 package de.perfectban.event.bungeecord;
 
 import de.perfectban.PerfectBan;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
 import de.perfectban.entity.repository.BanRepository;
-import net.md_5.bungee.api.ProxyServer;
+import de.perfectban.util.PlaceholderManager;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
-import sun.misc.Perf;
 
 import javax.persistence.EntityTransaction;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerJoinListener implements Listener
-{
+public class PlayerJoinListener implements Listener {
     private final BanRepository repository;
 
     public PlayerJoinListener() {
@@ -25,6 +26,9 @@ public class PlayerJoinListener implements Listener
 
     @EventHandler
     public void onJoin(LoginEvent event) {
+        Configuration configuration = ConfigManager.getConfig(ConfigType.MESSAGES);
+        assert configuration != null;
+
         UUID uuid = event.getConnection().getUniqueId();
         Date now = new Date();
 
@@ -49,14 +53,11 @@ public class PlayerJoinListener implements Listener
             return;
         }
 
+        String banMessage = PlaceholderManager.replaceBanPlaceholders(
+                configuration.getString("perfectban.ban.ban_message"), ban);
+
         // disallow player from joining
         event.setCancelled(true);
-        event.setCancelReason(new TextComponent(
-            String.format("§cYou are banned!\n\n§f#%s\n\n§eGrund: §f%s\n§eUntil: §f%s",
-                ban.getId(),
-                ban.getReason(),
-                ban.isLifetime() ? "Lifetime" : ban.getUntil().toString()
-            )
-        ));
+        event.setCancelReason(new TextComponent(banMessage));
     }
 }
