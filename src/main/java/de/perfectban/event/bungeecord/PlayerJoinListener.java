@@ -44,12 +44,7 @@ public class PlayerJoinListener implements Listener {
 
         // if not lifetime & until is smaller than current time, mark ban as inactive
         if (!ban.isLifetime() && ban.getUntil().getTime() <= now.getTime()) {
-            EntityTransaction transaction = PerfectBan.getInstance().getEntityManager().getTransaction();
-
-            // update ban in database
-            transaction.begin();
-            ban.setActive(false);
-            transaction.commit();
+            repository.deleteBan(ban.getId());
             return;
         }
 
