@@ -5,16 +5,26 @@ import de.perfectban.command.CommandInterface;
 import de.perfectban.entity.Ban;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.plugin.Command;
 import org.apache.commons.cli.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class BanCommand implements CommandInterface
+public class BanCommand extends Command implements CommandInterface
 {
+
+    public BanCommand(String name) {
+        super(name);
+    }
+
+    public BanCommand(String name, String permission, String... aliases) {
+        super(name, permission, aliases);
+    }
+
     @Override
-    public void onCommand(CommandSender commandSender, String[] args, String label) {
+    public void execute(CommandSender commandSender, String[] args) {
         String action = args[0];
 
         Options options = new Options();
@@ -63,16 +73,6 @@ public class BanCommand implements CommandInterface
             // todo: error
             commandSender.sendMessage(new TextComponent("todo: error"));
         }
-    }
-
-    @Override
-    public List<String> getAliases() {
-        return Collections.singletonList("perfectban"); // todo: configurable
-    }
-
-    @Override
-    public String getPermission() {
-        return "perfectban.ban.command.permission"; // todo: configurable
     }
 
     @Override

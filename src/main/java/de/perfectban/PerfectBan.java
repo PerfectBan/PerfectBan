@@ -1,10 +1,9 @@
 package de.perfectban;
 
-import de.perfectban.command.CommandListener;
-import de.perfectban.command.CommandManager;
 import de.perfectban.command.ban.BanCommand;
 import de.perfectban.entity.Ban;
 import de.perfectban.event.bungeecord.PlayerJoinListener;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -17,7 +16,6 @@ public class PerfectBan extends Plugin {
 
     private static PerfectBan instance;
 
-    private CommandManager commandManager;
     private EntityManager entityManager;
     private SessionFactory sessionFactory;
 
@@ -39,12 +37,13 @@ public class PerfectBan extends Plugin {
         entityManager = sessionFactory.createEntityManager();
 
         // setup commands
-        commandManager = new CommandManager();
-        commandManager.addCommand(new BanCommand());
+        ProxyServer.getInstance().getPluginManager().registerCommand(
+            this,
+            new BanCommand("perfectban", "perfectban.permission")
+        );
 
         // setup listeners
         this.getProxy().getPluginManager().registerListener(this, new PlayerJoinListener());
-        this.getProxy().getPluginManager().registerListener(this, new CommandListener());
     }
 
     @Override
@@ -62,9 +61,5 @@ public class PerfectBan extends Plugin {
 
     public static PerfectBan getInstance() {
         return instance;
-    }
-
-    public CommandManager getCommandManager() {
-        return commandManager;
     }
 }
