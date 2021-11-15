@@ -5,6 +5,7 @@ import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
 import de.perfectban.entity.repository.BanRepository;
+import de.perfectban.meta.Config;
 import de.perfectban.util.PlaceholderManager;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -45,8 +46,7 @@ public class PlayerJoinListener implements Listener
         }
 
         String banMessage = PlaceholderManager.replaceBanPlaceholders(
-            ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.ban_message"),
-            ban
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE), ban
         );
 
         // disallow player from joining
