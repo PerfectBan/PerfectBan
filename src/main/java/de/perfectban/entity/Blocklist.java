@@ -1,6 +1,7 @@
 package de.perfectban.entity;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "blocklist")
@@ -11,11 +12,14 @@ public class Blocklist
     @Column(name = "id")
     private int id;
 
-    @Column(name = "match")
-    private String match;
+    @Column(name = "matched", columnDefinition = "text not null")
+    private String matched;
 
-    @Column(name = "type")
+    @Column(name = "type", columnDefinition = "varchar(16) not null")
     private String type;
+
+    @Column(name = "created", columnDefinition = "timestamp default CURRENT_TIMESTAMP()")
+    private Timestamp created;
 
     public Blocklist() {}
 
@@ -28,12 +32,12 @@ public class Blocklist
         return this;
     }
 
-    public String getMatch() {
-        return match;
+    public String getMatched() {
+        return matched;
     }
 
-    public Blocklist setMatch(String match) {
-        this.match = match;
+    public Blocklist setMatched(String matched) {
+        this.matched = matched;
         return this;
     }
 
@@ -43,6 +47,16 @@ public class Blocklist
 
     public Blocklist setType(String type) {
         this.type = type;
+        return this;
+    }
+
+
+    public Timestamp getCreated() {
+        return created;
+    }
+
+    public Blocklist setCreated(Timestamp created) {
+        this.created = created;
         return this;
     }
 }

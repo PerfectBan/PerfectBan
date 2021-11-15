@@ -1,16 +1,27 @@
 package de.perfectban.entity.repository;
 
 import de.perfectban.entity.Blocklist;
+import de.perfectban.exceptions.InvalidTypeException;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BlocklistRepository
 {
+    public final static String TYPE_MATCH = "match";
+    public final static String TYPE_CONTAINS = "contains";
+
     private final EntityManager entityManager;
+    private final ArrayList<String> types;
 
     public BlocklistRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
+
+        this.types = new ArrayList<>();
+        this.types.add(TYPE_MATCH);
+        this.types.add(TYPE_CONTAINS);
     }
 
     public Blocklist getEntry(int id) {
@@ -23,12 +34,14 @@ public class BlocklistRepository
                 .getResultList();
     }
 
-    public Blocklist createEntry(String match, String type) {
+    public Blocklist createEntry(String match, String type) throws InvalidTypeException {
         Blocklist blocklist = new Blocklist();
 
-        // todo: check if type is valid
+        if (!types.contains(type)) {
+            throw new InvalidTypeException();
+        }
 
-        blocklist.setMatch(match);
+        blocklist.setMatched(match);
         blocklist.setType(type);
 
         entityManager.persist(blocklist);
