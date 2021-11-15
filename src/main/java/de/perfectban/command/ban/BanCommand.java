@@ -2,18 +2,27 @@ package de.perfectban.command.ban;
 
 import de.perfectban.PerfectBan;
 import de.perfectban.command.CommandInterface;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
+import de.perfectban.entity.repository.BanRepository;
+import de.perfectban.util.TimeManager;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import org.apache.commons.cli.*;
 
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 public class BanCommand extends Command implements CommandInterface
 {
+    private final BanRepository repository
+            = new BanRepository(PerfectBan.getInstance().getEntityManager());
 
     public BanCommand(String name) {
         super(name);
@@ -25,43 +34,65 @@ public class BanCommand extends Command implements CommandInterface
 
     @Override
     public void execute(CommandSender commandSender, String[] args) {
+        if (args.length == 0) {
+            commandSender.sendMessage(new TextComponent(getDescription()));
+            return;
+        }
+
         String action = args[0];
 
-        Options options = new Options();
-        CommandLineParser parser = new BasicParser();
-
-        options.addOption(new Option("r", "reason", false, "The reason for the ban"));
-        options.addOption(new Option("t", "time", false, "The time a player will be banned"));
-        options.addOption(new Option("lt", "lifetime", false, "Ban forever"));
-        options.addOption(new Option("ip", "ipban", false, "IP-Ban"));
-
         try {
-            CommandLine commandLine = parser.parse(options, args);
+            CommandLine commandLine = parseCommandLineArguments(args);
 
+            // arguments
             String reason = commandLine.getOptionValue("r");
             String time = commandLine.getOptionValue("t");
             boolean lifetime = commandLine.hasOption("lt");
             boolean ip = commandLine.hasOption("ip");
 
             // todo: remove debug
-            commandSender.sendMessage(new TextComponent(String.format(
-                    "r: %s, t: %s, lifetime: %s, ip: %s",
-                    reason,
-                    time,
-                    lifetime ? "yes" : "no",
-                    ip ? "yes" : "no"
-            )));
 
-            if (action.equalsIgnoreCase("info")) {
-                Long id = Long.valueOf(args[1]);
-                Ban ban = PerfectBan.getInstance().getEntityManager().find(Ban.class, id);
+            if (args.length >= 2 && action.equalsIgnoreCase("ban")) {
+                String player = args[1];
+                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(player);
+
+                if (proxiedPlayer == null) {
+                    commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                            .getString("perfectban.error.player_not_found")));
+                    return;
+                }
+
+                // calculate until
+                long diff = TimeManager.convertToMillis(time);
+                Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
+
+                List<Ban> bans = repository.getBans(proxiedPlayer.getUniqueId());
+
+                if (!bans.isEmpty()) {
+                    commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES)
+                            .getString("perfectban.error.player_already_fined")));
+                    return;
+                }
+
+                // ban player
+                Ban ban = repository.createBan(proxiedPlayer.getUniqueId(), reason, until, lifetime, false);
+
+                // broadcast to moderators
+                if (ConfigManager.getConfig(ConfigType.SETTINGS).getBoolean("useBroadcast")) {
+                    // todo: remove debug
+                    ProxyServer.getInstance().broadcast(new
+                        TextComponent(String.format("§cPlayer §e%s§c was banned for §e%s", proxiedPlayer.getDisplayName(), ban.getReason())));
+                }
+
+                commandSender.sendMessage(new TextComponent(ConfigManager.getConfig(ConfigType.MESSAGES).getString("perfectban.ban.command.player_banned")));
+            } else if (action.equalsIgnoreCase("info")) {
+                int id = Integer.parseInt(args[1]);
+                Ban ban = repository.getBan(id);
 
                 if (ban == null) {
                     // todo: send message
                     return;
                 }
-
-                // todo: send success message
             } else if (action.equalsIgnoreCase("delete")) {
 
             } else if (action.equalsIgnoreCase("change")) {
@@ -82,11 +113,23 @@ public class BanCommand extends Command implements CommandInterface
 
     @Override
     public String getDescription() {
-        return "perfectban.ban.command.description"; // todo: configurable;
+        return ConfigManager.getConfig(ConfigType.MESSAGES).getString("perfectban.ban.command.description");
     }
 
     @Override
     public boolean isPlayerOnly() {
         return false;
+    }
+
+    private CommandLine parseCommandLineArguments(String[] args) throws ParseException {
+        Options options = new Options();
+        CommandLineParser parser = new BasicParser();
+
+        options.addOption(new Option("r", "reason", true, "The reason for the ban"));
+        options.addOption(new Option("t", "time", true, "The time a player will be banned"));
+        options.addOption(new Option("lt", "lifetime", false, "Ban forever"));
+        options.addOption(new Option("ip", "ipban", false, "IP-Ban"));
+
+        return parser.parse(options, args);
     }
 }

@@ -1,8 +1,10 @@
 package de.perfectban.entity.repository;
 
 import de.perfectban.entity.Mute;
+import org.hibernate.Transaction;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,10 @@ public class MuteRepository
     }
 
     public Mute createMute(UUID uuid, String reason, String match, Date until, boolean lifetime, boolean automatic) {
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        transaction.begin();
+
         Mute mute = new Mute();
 
         mute.setUuid(uuid.toString());
@@ -38,6 +44,9 @@ public class MuteRepository
         mute.setAutomatic(automatic);
 
         entityManager.persist(mute);
+        entityManager.flush();
+
+        transaction.commit();
 
         return mute;
     }

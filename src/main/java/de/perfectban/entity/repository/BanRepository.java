@@ -3,6 +3,8 @@ package de.perfectban.entity.repository;
 import de.perfectban.entity.Ban;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -27,16 +29,28 @@ public class BanRepository
                 .getResultList();
     }
 
-    public Ban createBan(UUID uuid, String reason, Date until, boolean lifetime, boolean automatic) {
+    public Ban createBan(UUID uuid, String reason, Timestamp until, boolean lifetime, boolean automatic) {
+        EntityTransaction transaction = entityManager.getTransaction();
+
+        transaction.begin();
+
         Ban ban = new Ban();
 
         ban.setUuid(uuid.toString());
         ban.setReason(reason);
-        ban.setUntil(until);
+
+        if (!lifetime) {
+            ban.setUntil(until);
+        }
+
         ban.setLifetime(lifetime);
         ban.setAutomatic(automatic);
+        ban.setActive(true);
 
         entityManager.persist(ban);
+        entityManager.flush();
+
+        transaction.commit();
 
         return ban;
     }

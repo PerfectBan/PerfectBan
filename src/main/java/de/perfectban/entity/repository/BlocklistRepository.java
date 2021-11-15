@@ -32,6 +32,7 @@ public class BlocklistRepository
         blocklist.setType(type);
 
         entityManager.persist(blocklist);
+        entityManager.flush();
 
         return blocklist;
     }
