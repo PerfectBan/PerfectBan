@@ -1,26 +1,36 @@
 package de.perfectban.config;
 
-import java.util.HashMap;
+import de.perfectban.PerfectBan;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
 public class ConfigManager {
 
-    private final HashMap<ConfigType, Config> configs = new HashMap<>();
+    public static Configuration getConfig(ConfigType configType) {
+        try {
+            File file = new File(PerfectBan.getInstance().getDataFolder().getPath(), configType.getPath());
 
-    public ConfigManager() {
-        reloadConfigs();
-    }
+            if (!file.exists()) {
+                file.createNewFile();
 
-    public Config getConfig(ConfigType configType) {
-        return configs.get(configType);
-    }
+                InputStream inputStream = PerfectBan.getInstance().getResourceAsStream(configType.getDefaults());
 
-    public void reloadConfig(ConfigType configType) {
-        configs.put(configType, new Config(configType));
-    }
+                if (inputStream != null) {
+                    Files.copy(inputStream, file.toPath());
+                }
+            }
 
-    public void reloadConfigs() {
-        for (ConfigType configType : ConfigType.values()) {
-            configs.put(configType, new Config(configType));
+            return ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        return new Configuration();
     }
 }
