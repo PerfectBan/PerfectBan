@@ -2,11 +2,13 @@ package de.perfectban.event.bungeecord;
 
 import de.perfectban.PerfectBan;
 import de.perfectban.entity.Ban;
+import de.perfectban.entity.repository.BanRepository;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import sun.misc.Perf;
 
 import javax.persistence.EntityTransaction;
 import java.util.Date;
@@ -15,23 +17,19 @@ import java.util.UUID;
 
 public class PlayerJoinListener implements Listener
 {
+    private final BanRepository repository;
+
+    public PlayerJoinListener() {
+        this.repository = new BanRepository(PerfectBan.getInstance().getEntityManager());
+    }
+
     @EventHandler
     public void onJoin(LoginEvent event) {
         UUID uuid = event.getConnection().getUniqueId();
         Date now = new Date();
 
         // find ban by searching for UUID
-        List<Ban> bans = PerfectBan
-            .getInstance()
-            .getEntityManager()
-            .createQuery("FROM Ban WHERE uuid = :uuid AND active = :active ORDER BY until DESC", Ban.class)
-            .setParameter("uuid", uuid.toString())
-            .setParameter("active", true)
-            .getResultList();
-
-        ProxyServer.getInstance().broadcast(
-                new TextComponent("Es gibt " + bans.size() + " Einträge für " + uuid.toString())
-        );
+        List<Ban> bans = repository.getBans(uuid);
 
         // player not banned, return
         if (bans.isEmpty()) {
