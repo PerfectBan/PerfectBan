@@ -3,7 +3,11 @@ package de.perfectban.util;
 public class TimeManager {
 
     public static long convertToMillis(String time) {
-        String[] split = time.split(" ");
+        if (time == null) {
+            return 0;
+        }
+
+        String[] split = time.split("/\\s/");
 
         long millis = 0L;
 
@@ -21,7 +25,7 @@ public class TimeManager {
             } else if (value.endsWith("d")) {
                 millis += 86400000L * number;
             } else if (value.endsWith("w")) {
-                millis += 25200000L * number;
+                millis += 604800000L * number;
             }
         }
 
@@ -29,7 +33,7 @@ public class TimeManager {
     }
 
     public static String convertToString(long diff) {
-        int days = 0, hours = 0, minutes = 0;
+        int days = 0, hours = 0, minutes = 0, seconds = 0;
 
         while (diff >= 86400000L) {
             diff -= 86400000L;
@@ -44,6 +48,19 @@ public class TimeManager {
         while (diff >= 60000L) {
             diff -= 60000L;
             minutes ++;
+        }
+
+        while (diff >= 1000L) {
+            diff -= 1000L;
+            seconds ++;
+        }
+
+        if (days == 0 && hours == 0) {
+            return String.format(
+                    "%s minute%s, %s second%s",
+                    minutes, (minutes != 1 ? "s" : ""),
+                    seconds, (seconds != 1 ? "s" : "")
+            );
         }
 
         if (days == 0) {

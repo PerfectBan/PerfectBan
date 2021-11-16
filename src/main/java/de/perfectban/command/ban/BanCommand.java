@@ -6,6 +6,7 @@ import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
 import de.perfectban.entity.repository.BanRepository;
+import de.perfectban.meta.Config;
 import de.perfectban.util.PlaceholderManager;
 import de.perfectban.util.TimeManager;
 import de.perfectban.util.UUIDFetcher;
@@ -17,15 +18,14 @@ import org.apache.commons.cli.*;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class BanCommand extends Command implements CommandInterface
 {
     private final BanRepository repository
             = new BanRepository(PerfectBan.getInstance().getEntityManager());
 
-    public BanCommand(String name) {
-        super(name);
+    public BanCommand(String name, String permission) {
+        super(name, permission);
     }
 
     @Override
@@ -52,18 +52,22 @@ public class BanCommand extends Command implements CommandInterface
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_found")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND))
+                        ));
                         return;
                     }
 
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_fined")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED))
+                        ));
                         return;
                     }
 
-                    String message = ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.info");
+                    String message = PlaceholderManager.replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO), bans.get(0));
 
                     commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(message, bans.get(0))));
                 });
@@ -72,14 +76,18 @@ public class BanCommand extends Command implements CommandInterface
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_found")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND))
+                        ));
                         return;
                     }
 
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_fined")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)
+                        )));
                         return;
                     }
 
@@ -90,24 +98,32 @@ public class BanCommand extends Command implements CommandInterface
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        // todo: escape placeholders
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.broadcast_ban")));
+                        String message = PlaceholderManager.replaceBanPlaceholders(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban
+                        );
+                        commandSender.sendMessage(new TextComponent(message));
+                        return;
                     }
 
                     commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_unbanned")));
                 });
             } else if (args.length >= 2 && action.equalsIgnoreCase("change")) {
                 String player = args[1];
+
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_found")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)
+                        )));
                         return;
                     }
 
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_fined")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)
+                        )));
                         return;
                     }
 
@@ -115,25 +131,42 @@ public class BanCommand extends Command implements CommandInterface
 
                     // calculate until
                     long diff = TimeManager.convertToMillis(time);
-                    Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
 
-                    // soft delete ban
-                    repository.editBan(ban.getId(), reason, until, lifetime);
+                    if (diff != 0) {
+                        Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
+
+                        // soft delete ban
+                        repository.editBan(ban.getId(), reason, until, lifetime);
+                    } else {
+                        // soft delete ban
+                        repository.editBan(ban.getId(), reason, null, lifetime);
+                    }
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        // todo: send broadcast message
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CHANGE), ban
+                        )));
+                        return;
                     }
 
                     commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.ban_edited")));
                 });
             } else if (args.length >= 2) {
                 // this should be username or random
-                String player = args[1];
+                String player = args[0];
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_found")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)
+                        )));
+                        return;
+                    }
+
+                    // check if reason and time is set
+                    if (reason == null || time == null) {
+                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.ban.arguments")));
                         return;
                     }
 
@@ -144,7 +177,9 @@ public class BanCommand extends Command implements CommandInterface
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (!bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_already_fined")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED)
+                        )));
                         return;
                     }
 
@@ -153,10 +188,14 @@ public class BanCommand extends Command implements CommandInterface
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        // todo: send broadcast message
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CREATE), ban
+                        )));
+                        return;
                     }
 
-                    String message = ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_banned");
+                    String message = PlaceholderManager
+                        .replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_banned"), ban);
 
                     commandSender.sendMessage(new TextComponent(message));
                 });
@@ -176,7 +215,9 @@ public class BanCommand extends Command implements CommandInterface
 
     @Override
     public String getDescription() {
-        return ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.description");
+        return PlaceholderManager.replacePrefix(
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION)
+        );
     }
 
     private CommandLine parseCommandLineArguments(String[] args) throws ParseException {

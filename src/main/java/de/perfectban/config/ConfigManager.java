@@ -1,6 +1,7 @@
 package de.perfectban.config;
 
 import de.perfectban.PerfectBan;
+import de.perfectban.util.PlaceholderManager;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -8,8 +9,8 @@ import net.md_5.bungee.config.YamlConfiguration;
 import java.io.*;
 import java.nio.file.Files;
 
-public class ConfigManager {
-
+public class ConfigManager
+{
     static {
         PerfectBan.getInstance().getDataFolder().mkdirs();
 
@@ -23,15 +24,15 @@ public class ConfigManager {
         }
     }
 
-    public static String getString(ConfigType configType, String key){
+    public static String getString(ConfigType configType, String key) {
         return getObject(configType, key).toString();
     }
 
-    public static boolean getBoolean(ConfigType configType, String key){
+    public static boolean getBoolean(ConfigType configType, String key) {
         return Boolean.parseBoolean(getObject(configType, key).toString());
     }
 
-    public static int getInteger(ConfigType configType, String key){
+    public static int getInteger(ConfigType configType, String key) {
         return Integer.parseInt(getObject(configType, key).toString());
     }
 
@@ -39,11 +40,11 @@ public class ConfigManager {
         Configuration configuration = getConfig(configType, false);
         Configuration defaultConfiguration = getConfig(configType, true);
 
-        if(configuration != null && !configuration.getString(key).isEmpty()){
+        if (configuration != null && !configuration.getString(key).isEmpty()) {
             return configuration.get(key);
         }
 
-        if(defaultConfiguration != null && !defaultConfiguration.getString(key).isEmpty()){
+        if (defaultConfiguration != null && !defaultConfiguration.getString(key).isEmpty()) {
             return defaultConfiguration.get(key);
         }
 
@@ -54,7 +55,7 @@ public class ConfigManager {
         File configFile = new File(PerfectBan.getInstance().getDataFolder().getPath(), configType.getPath());
         InputStream defaultInputStream = PerfectBan.getInstance().getResourceAsStream(configType.getDefaults());
 
-        if(configFile.exists() || defaultInputStream == null){
+        if (configFile.exists() || defaultInputStream == null) {
             return;
         }
 
@@ -64,7 +65,7 @@ public class ConfigManager {
     private static Configuration getConfig(ConfigType configType, boolean useDefault) {
         try {
             return ConfigurationProvider.getProvider(YamlConfiguration.class)
-                    .load(getInputStream(configType, useDefault));
+                .load(getInputStream(configType, useDefault));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,11 +74,12 @@ public class ConfigManager {
     }
 
     private static InputStream getInputStream(ConfigType configType, boolean useDefault) throws FileNotFoundException {
-        if(useDefault){
+        if (useDefault) {
             return PerfectBan.getInstance().getResourceAsStream(configType.getDefaults());
-        }else{
+        } else {
             return new FileInputStream(
-                    new File(PerfectBan.getInstance().getDataFolder().getPath(), configType.getPath()));
+                new File(PerfectBan.getInstance().getDataFolder().getPath(), configType.getPath())
+            );
         }
     }
 }

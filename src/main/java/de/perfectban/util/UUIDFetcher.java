@@ -7,17 +7,13 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-/**
- * @author Christian Tschörner
- */
-public class UUIDFetcher {
-
+public class UUIDFetcher
+{
     private static final HashMap<String, UUID> CACHE = new HashMap<>();
-
     private static final String UUID_URL = "https://minecraft-api.com/api/uuid/%s";
 
-    public static void getUUIDbyName(String name, Consumer<UUID> callback){
-        if(CACHE.containsKey(name.toUpperCase())){
+    public static void getUUIDbyName(String name, Consumer<UUID> callback) {
+        if(CACHE.containsKey(name.toUpperCase())) {
             callback.accept(CACHE.get(name.toUpperCase()));
             return;
         }
