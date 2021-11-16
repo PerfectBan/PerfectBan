@@ -14,8 +14,6 @@ public class TimeManager {
         for (String value : split) {
             int number = Integer.parseInt(value.substring(0, value.length() - 1));
 
-            System.out.println(value);
-
             if (value.endsWith("s")) {
                 millis += 1000L * number;
             } else if (value.endsWith("m")) {

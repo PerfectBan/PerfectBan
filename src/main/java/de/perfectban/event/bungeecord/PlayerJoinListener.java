@@ -46,7 +46,7 @@ public class PlayerJoinListener implements Listener
         }
 
         String banMessage = PlaceholderManager.replaceBanPlaceholders(
-            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE), ban
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE), ban, event.getConnection().getName()
         );
 
         // disallow player from joining

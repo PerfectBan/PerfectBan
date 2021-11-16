@@ -8,7 +8,7 @@ ban:
     §b§lREASON: §f{REASON}
     §b§lTIME LEFT: §f{TIME}
 
-    §eFor more information visit §b§lexample.com/unban"
+    §eFor more information visit §b§lexample.com/unban
   command:
     templates:
       info: |

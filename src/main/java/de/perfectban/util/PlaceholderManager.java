@@ -7,10 +7,12 @@ import de.perfectban.meta.Config;
 
 public class PlaceholderManager {
 
-    public static String replaceBanPlaceholders(String message, Ban ban) {
+    public static String replaceBanPlaceholders(String message, Ban ban, String player) {
         message = replacePrefix(message);
         message = message.replace("{ID}", String.valueOf(ban.getId()));
         message = message.replace("{REASON}", ban.getReason());
+        message = message.replace("{BANNED_BY}", ban.getModerator());
+        message = message.replace("{PLAYER}", player);
         message = message.replace("{UNTIL}", ban.getUntil() == null
             ? "N/A"
             : ban.getUntil().toLocaleString());
