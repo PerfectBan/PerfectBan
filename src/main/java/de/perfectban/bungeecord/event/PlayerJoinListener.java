@@ -1,4 +1,4 @@
-package de.perfectban.event.bungeecord;
+package de.perfectban.bungeecord.event;
 
 import de.perfectban.PerfectBan;
 import de.perfectban.config.ConfigManager;

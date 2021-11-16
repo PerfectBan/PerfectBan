@@ -30,7 +30,7 @@ public class MuteRepository
                 .getResultList();
     }
 
-    public Mute createMute(UUID uuid, String reason, String matched, Timestamp until, boolean lifetime, boolean automatic) {
+    public Mute createMute(UUID uuid, String reason, String matched, Timestamp until, boolean lifetime, boolean automatic, String moderator) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
