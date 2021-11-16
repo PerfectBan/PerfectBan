@@ -44,7 +44,7 @@
                         </goals>
                         <configuration>
                             <finalName>PerfectBan-shaded.jar</finalName>
-                            <outputDirectory>E:\Server\PerfectBan Bungee\plugins</outputDirectory>
+                            <outputDirectory>C:\Users\Jkk\Desktop\BungeeCord\plugins</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

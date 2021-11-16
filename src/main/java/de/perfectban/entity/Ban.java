@@ -2,6 +2,8 @@ package de.perfectban.entity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Table(name = "ban")
 public class Ban
@@ -27,6 +29,12 @@ public class Ban
 
     @Column(name = "active", columnDefinition = "boolean default true")
     private boolean active;
+
+    @Column(name = "moderator", columnDefinition = "varchar(64) not null")
+    private String moderator;
+
+    @OneToMany(mappedBy = "ban", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BanChange> banChanges = new ArrayList<>();
 
     @Column(name = "created", columnDefinition = "timestamp default CURRENT_TIMESTAMP()")
     private Timestamp created;
@@ -93,6 +101,24 @@ public class Ban
 
     public Ban setActive(boolean active) {
         this.active = active;
+        return this;
+    }
+
+    public String getModerator() {
+        return moderator;
+    }
+
+    public Ban setModerator(String moderator) {
+        this.moderator = moderator;
+        return this;
+    }
+
+    public List<BanChange> getBanChanges() {
+        return banChanges;
+    }
+
+    public Ban setBanChanges(List<BanChange> banChanges) {
+        this.banChanges = banChanges;
         return this;
     }
 

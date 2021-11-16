@@ -4,6 +4,7 @@ import de.perfectban.command.ban.BanCommand;
 import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.entity.Ban;
+import de.perfectban.entity.BanChange;
 import de.perfectban.entity.Blocklist;
 import de.perfectban.entity.Mute;
 import de.perfectban.event.bungeecord.PlayerJoinListener;
@@ -42,6 +43,7 @@ public class PerfectBan extends Plugin
                 .setProperty("hibernate.connection.password", ConfigManager.getString(ConfigType.DATABASE, Config.DATABASE_PASSWORD))
                 .setProperty("hibernate.hbm2ddl.auto", "update")
                 .addAnnotatedClass(Ban.class)
+                .addAnnotatedClass(BanChange.class)
                 .addAnnotatedClass(Mute.class)
                 .addAnnotatedClass(Blocklist.class);
 

@@ -28,7 +28,7 @@ public class BanRepository
             .getResultList();
     }
 
-    public Ban createBan(UUID uuid, String reason, Timestamp until, boolean lifetime, boolean automatic) {
+    public Ban createBan(UUID uuid, String reason, Timestamp until, boolean lifetime, boolean automatic, String moderator) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -45,6 +45,7 @@ public class BanRepository
         ban.setLifetime(lifetime);
         ban.setAutomatic(automatic);
         ban.setActive(true);
+        ban.setModerator(moderator);
 
         entityManager.persist(ban);
         entityManager.flush();
@@ -54,10 +55,13 @@ public class BanRepository
         return ban;
     }
 
-    public void editBan(int id, String reason, Timestamp until, Boolean lifetime) {
+    public void editBan(int id, String reason, Timestamp until, Boolean lifetime, String moderator) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         Ban ban = getBan(id);
+
+        BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
+        banChangeRepository.createChange(ban, reason, until, lifetime, moderator);
 
         transaction.begin();
 

@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 public class Blocklist
 {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
