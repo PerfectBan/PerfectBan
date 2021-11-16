@@ -1,7 +1,7 @@
 ban:
   command: "ban"
   permission: "perfectban.ban.command"
-  description: >
+  description: |
     {PREFIX} /ban <Spieler> -r <Reason> -t <Time> -lt (-lifetime) -ip §7Ban a player
     {PREFIX} /ban change <Spieler> -r <Reason> -t <Time> -lt (-lifetime) §7Change a players ban
     {PREFIX} /ban delete <Spieler> -r <Reason>§7Pardon a player
@@ -9,7 +9,7 @@ ban:
 mute:
   command: "mute"
   permission: "perfectban.mute.command"
-  description: >
+  description: |
     {PREFIX} /mute <Spieler> -r <Reason> -t <Time> -lt (-lifetime) -ip §7Mute a player
     {PREFIX} /mute change <Spieler> -r <Reason> -t <Time> -lt (-lifetime) §7Change a players mute
     {PREFIX} /mute delete <Spieler> -r <Reason>§7Unmute a player

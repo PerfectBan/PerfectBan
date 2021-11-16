@@ -18,7 +18,6 @@ import org.apache.commons.cli.*;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 public class BanCommand extends Command implements CommandInterface
 {
@@ -53,18 +52,22 @@ public class BanCommand extends Command implements CommandInterface
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND))
+                        ));
                         return;
                     }
 
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED))
+                        ));
                         return;
                     }
 
-                    String message = ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO);
+                    String message = PlaceholderManager.replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO), bans.get(0));
 
                     commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(message, bans.get(0))));
                 });
@@ -73,14 +76,18 @@ public class BanCommand extends Command implements CommandInterface
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND))
+                        ));
                         return;
                     }
 
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)
+                        )));
                         return;
                     }
 
@@ -91,7 +98,10 @@ public class BanCommand extends Command implements CommandInterface
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE)));
+                        String message = PlaceholderManager.replaceBanPlaceholders(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban
+                        );
+                        commandSender.sendMessage(new TextComponent(message));
                         return;
                     }
 
@@ -102,14 +112,18 @@ public class BanCommand extends Command implements CommandInterface
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)
+                        )));
                         return;
                     }
 
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.player_not_fined")));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)
+                        )));
                         return;
                     }
 
@@ -130,9 +144,9 @@ public class BanCommand extends Command implements CommandInterface
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        commandSender.sendMessage(new TextComponent(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CHANGE)
-                        ));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CHANGE), ban
+                        )));
                         return;
                     }
 
@@ -144,7 +158,9 @@ public class BanCommand extends Command implements CommandInterface
 
                 UUIDFetcher.getUUIDbyName(player, uuid -> {
                     if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)
+                        )));
                         return;
                     }
 
@@ -161,7 +177,9 @@ public class BanCommand extends Command implements CommandInterface
                     List<Ban> bans = repository.getBans(uuid);
 
                     if (!bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED)));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
+                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED)
+                        )));
                         return;
                     }
 
@@ -170,13 +188,14 @@ public class BanCommand extends Command implements CommandInterface
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        commandSender.sendMessage(new TextComponent(
-                                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CREATE)
-                        ));
+                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(
+                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CREATE), ban
+                        )));
                         return;
                     }
 
-                    String message = ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_banned");
+                    String message = PlaceholderManager
+                        .replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_banned"), ban);
 
                     commandSender.sendMessage(new TextComponent(message));
                 });
@@ -196,7 +215,9 @@ public class BanCommand extends Command implements CommandInterface
 
     @Override
     public String getDescription() {
-        return ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION);
+        return PlaceholderManager.replacePrefix(
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION)
+        );
     }
 
     private CommandLine parseCommandLineArguments(String[] args) throws ParseException {

@@ -1,6 +1,6 @@
 prefix: "§b§lPerfectBan §8|§f"
 ban:
-  ban_message: >
+  ban_message: |
     §cYou were banned from §4§lexample.com§c!
 
     §f§lID #{ID}
@@ -11,13 +11,13 @@ ban:
     §eFor more information visit §b§lexample.com/unban"
   command:
     templates:
-      info: >
+      info: |
         {PREFIX} Information about §e{PLAYER}
         {PREFIX} §8=========================
         {PREFIX} Id: §e{ID}
         {PREFIX} Reason: §e{REASON}
-        {PREFIX} Until: §e{UNTIL}"
-        {PREFIX} Time left: §e{TIME}"
+        {PREFIX} Until: §e{UNTIL}
+        {PREFIX} Time left: §e{TIME}
     broadcast:
       create: "{PREFIX} Player {PLAYER} was banned for {REASON} from {BANNED_BY}"
       change: "{PREFIX} Ban with id {ID} ({PLAYER}) was changed by {BANNED_BY}"

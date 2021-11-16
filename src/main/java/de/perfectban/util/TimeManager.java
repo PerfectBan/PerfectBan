@@ -33,7 +33,7 @@ public class TimeManager {
     }
 
     public static String convertToString(long diff) {
-        int days = 0, hours = 0, minutes = 0;
+        int days = 0, hours = 0, minutes = 0, seconds = 0;
 
         while (diff >= 86400000L) {
             diff -= 86400000L;
@@ -48,6 +48,19 @@ public class TimeManager {
         while (diff >= 60000L) {
             diff -= 60000L;
             minutes ++;
+        }
+
+        while (diff >= 1000L) {
+            diff -= 1000L;
+            seconds ++;
+        }
+
+        if (days == 0 && hours == 0) {
+            return String.format(
+                    "%s minute%s, %s second%s",
+                    minutes, (minutes != 1 ? "s" : ""),
+                    seconds, (seconds != 1 ? "s" : "")
+            );
         }
 
         if (days == 0) {
