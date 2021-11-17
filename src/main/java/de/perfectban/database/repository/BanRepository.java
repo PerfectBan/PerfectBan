@@ -28,7 +28,7 @@ public class BanRepository
             .getResultList();
     }
 
-    public Ban createBan(UUID uuid, String reason, Timestamp until, boolean lifetime, boolean automatic, String moderator) {
+    public Ban createBan(UUID uuid, String reason, Timestamp until, boolean lifetime, boolean automatic, UUID moderator) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -45,7 +45,7 @@ public class BanRepository
         ban.setLifetime(lifetime);
         ban.setAutomatic(automatic);
         ban.setActive(true);
-        ban.setModerator(moderator);
+        ban.setModerator(moderator == null ? null : moderator.toString());
 
         entityManager.persist(ban);
         entityManager.flush();
@@ -55,7 +55,7 @@ public class BanRepository
         return ban;
     }
 
-    public void editBan(int id, String reason, Timestamp until, Boolean lifetime, String moderator) {
+    public void editBan(int id, String reason, Timestamp until, Boolean lifetime, UUID moderator) {
         Ban ban = getBan(id);
 
         if (ban == null) {
@@ -63,7 +63,7 @@ public class BanRepository
         }
 
         BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
-        banChangeRepository.createChange(ban, reason, until, lifetime, moderator, "edit");
+        banChangeRepository.createChange(ban, reason, until, lifetime, (moderator == null ? null : moderator.toString()), "edit");
 
         EntityTransaction transaction = entityManager.getTransaction();
 
@@ -85,7 +85,7 @@ public class BanRepository
 
     }
 
-    public void deleteBan(int id, String moderator) {
+    public void deleteBan(int id, UUID moderator) {
         Ban ban = getBan(id);
 
         if (ban == null) {
@@ -94,7 +94,7 @@ public class BanRepository
 
         if (moderator != null) {
             BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
-            banChangeRepository.createChange(ban, null, null, null, moderator, "delete");
+            banChangeRepository.createChange(ban, null, null, null, (moderator == null ? null : moderator.toString()), "delete");
         }
 
         EntityTransaction transaction = entityManager.getTransaction();

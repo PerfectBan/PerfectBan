@@ -1,32 +1,31 @@
 package de.perfectban.bungeecord.command.ban;
 
-import de.perfectban.PerfectBan;
 import de.perfectban.command.CommandInterface;
 import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
-import de.perfectban.database.entity.Ban;
-import de.perfectban.database.repository.BanRepository;
+import de.perfectban.command.CommandParser;
+import de.perfectban.command.helper.BanCommandHelper;
 import de.perfectban.meta.Config;
 import de.perfectban.util.PlaceholderManager;
-import de.perfectban.util.TimeManager;
-import de.perfectban.util.UUIDFetcher;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
-import org.apache.commons.cli.*;
 
-import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class BanCommand extends Command implements CommandInterface
 {
-    private final BanRepository repository
-            = new BanRepository(PerfectBan.getInstance().getEntityManager());
+    private final CommandParser commandParser;
+    private final BanCommandHelper banCommandHelper;
 
     public BanCommand(String name, String permission) {
         super(name, permission);
+
+        this.commandParser = new CommandParser();
+        this.banCommandHelper = new BanCommandHelper();
     }
 
     @Override
@@ -37,176 +36,37 @@ public class BanCommand extends Command implements CommandInterface
             return;
         }
 
+        // the action the user wants to execute
+        // none equals banning the player
         String action = args[0];
-        String moderator = getModerator(commandSender);
 
-        try {
-            CommandLine commandLine = parseCommandLineArguments(args);
+        // the player/console that issued the action
+        UUID moderator = getModerator(commandSender);
 
-            // arguments
-            String reason = commandLine.getOptionValue("r");
-            String time = commandLine.getOptionValue("t");
-            boolean lifetime = commandLine.hasOption("lt");
-            boolean ip = commandLine.hasOption("ip");
+        // parse command arguments
+        String reason = commandParser.getReason(args);
+        String time = commandParser.getTime(args);
 
-            if (args.length >= 2 && action.equalsIgnoreCase("info")) {
-                String player = args[1];
+        // if no time provided -> default to permanent
+        boolean permanent = (time == null || time.isEmpty());
 
-                UUIDFetcher.getUUIDbyName(player, uuid -> {
-                    if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND))
-                        ));
-                        return;
-                    }
+        if (args.length >= 2 && action.equalsIgnoreCase("info")) {
+            String player = args[1];
 
-                    List<Ban> bans = repository.getBans(uuid);
+            banCommandHelper.banInfo(player, message -> commandSender.sendMessage(new TextComponent(message)));
+        } else if (args.length >= 2 && action.equalsIgnoreCase("delete")) {
+            String player = args[1];
 
-                    if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED))
-                        ));
-                        return;
-                    }
+            banCommandHelper.deleteBan(player, reason, moderator, message -> commandSender.sendMessage(new TextComponent(message)));
+        } else if (args.length >= 2 && action.equalsIgnoreCase("change")) {
+            String player = args[1];
 
-                    String message = PlaceholderManager.replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO), bans.get(0), player);
+            banCommandHelper.changeBan(player, reason, time, permanent, moderator, message -> commandSender.sendMessage(new TextComponent(message)));
+        } else {
+            // this should be username or random
+            String player = args[0];
 
-                    commandSender.sendMessage(new TextComponent(message));
-                });
-            } else if (args.length >= 2 && action.equalsIgnoreCase("delete")) {
-                String player = args[1];
-
-                UUIDFetcher.getUUIDbyName(player, uuid -> {
-                    if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND))
-                        ));
-                        return;
-                    }
-
-                    List<Ban> bans = repository.getBans(uuid);
-
-                    if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)
-                        )));
-                        return;
-                    }
-
-                    Ban ban = bans.get(0);
-
-                    // soft delete ban
-                    repository.deleteBan(ban.getId(), moderator);
-
-                    // broadcast to moderators
-                    if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        String message = PlaceholderManager.replaceBanPlaceholders(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban, player
-                        );
-                        commandSender.sendMessage(new TextComponent(message));
-                        return;
-                    }
-
-                    commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_unbanned")));
-                });
-            } else if (args.length >= 2 && action.equalsIgnoreCase("change")) {
-                String player = args[1];
-
-                UUIDFetcher.getUUIDbyName(player, uuid -> {
-                    if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)
-                        )));
-                        return;
-                    }
-
-                    List<Ban> bans = repository.getBans(uuid);
-
-                    if (bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED)
-                        )));
-                        return;
-                    }
-
-                    Ban ban = bans.get(0);
-
-                    // calculate until
-                    long diff = TimeManager.convertToMillis(time);
-
-                    if (diff != 0) {
-                        Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
-
-                        // soft delete ban
-                        repository.editBan(ban.getId(), reason, until, lifetime, moderator);
-                    } else {
-                        // soft delete ban
-                        repository.editBan(ban.getId(), reason, null, lifetime, moderator);
-                    }
-
-                    // broadcast to moderators
-                    if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CHANGE), ban, player
-                        )));
-                        return;
-                    }
-
-                    commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.ban_edited")));
-                });
-            } else if (args.length >= 2) {
-                // this should be username or random
-                String player = args[0];
-
-                UUIDFetcher.getUUIDbyName(player, uuid -> {
-                    if (uuid == null) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND)
-                        )));
-                        return;
-                    }
-
-                    // check if reason and time is set
-                    if (reason == null || time == null) {
-                        commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.ban.arguments")));
-                        return;
-                    }
-
-                    // calculate until
-                    long diff = TimeManager.convertToMillis(time);
-                    Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
-
-                    List<Ban> bans = repository.getBans(uuid);
-
-                    if (!bans.isEmpty()) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replacePrefix(
-                                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED)
-                        )));
-                        return;
-                    }
-
-                    // ban player
-                    Ban ban = repository.createBan(uuid, reason, until, lifetime, false, moderator);
-
-                    // broadcast to moderators
-                    if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                        commandSender.sendMessage(new TextComponent(PlaceholderManager.replaceBanPlaceholders(
-                            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CREATE), ban, player
-                        )));
-                        return;
-                    }
-
-                    String message = PlaceholderManager
-                        .replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.ban.command.player_banned"), ban, player);
-
-                    commandSender.sendMessage(new TextComponent(message));
-                });
-            } else {
-                // send help
-                commandSender.sendMessage(new TextComponent(getDescription()));
-            }
-        } catch (ParseException exception) {
-            commandSender.sendMessage(new TextComponent(ConfigManager.getString(ConfigType.MESSAGES, "perfectban.error.internal")));
+            banCommandHelper.ban(player, reason, time, permanent, moderator, message -> commandSender.sendMessage(new TextComponent(message)));
         }
     }
 
@@ -222,23 +82,11 @@ public class BanCommand extends Command implements CommandInterface
         );
     }
 
-    private CommandLine parseCommandLineArguments(String[] args) throws ParseException {
-        Options options = new Options();
-        CommandLineParser parser = new BasicParser();
-
-        options.addOption(new Option("r", "reason", true, "The reason for the ban"));
-        options.addOption(new Option("t", "time", true, "The time a player will be banned"));
-        options.addOption(new Option("lt", "lifetime", false, "Ban forever"));
-        options.addOption(new Option("ip", "ipban", false, "IP-Ban"));
-
-        return parser.parse(options, args);
-    }
-
-    private String getModerator(CommandSender commandSender) {
-        String moderator = "console";
+    private UUID getModerator(CommandSender commandSender) {
+        UUID moderator = null;
 
         if (commandSender instanceof ProxiedPlayer) {
-            moderator = ((ProxiedPlayer) commandSender).getUniqueId().toString();
+            moderator = ((ProxiedPlayer) commandSender).getUniqueId();
         }
 
         return moderator;

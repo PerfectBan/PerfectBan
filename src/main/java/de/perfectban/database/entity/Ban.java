@@ -30,7 +30,7 @@ public class Ban
     @Column(name = "active", columnDefinition = "boolean default true")
     private boolean active;
 
-    @Column(name = "moderator", columnDefinition = "varchar(64) not null")
+    @Column(name = "moderator", columnDefinition = "varchar(64) null")
     private String moderator;
 
     @OneToMany(mappedBy = "ban", cascade = CascadeType.ALL, orphanRemoval = true)

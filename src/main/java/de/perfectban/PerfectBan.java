@@ -17,8 +17,6 @@ import javax.persistence.EntityManager;
 
 public class PerfectBan extends Plugin
 {
-    public static final String BASE_PACKAGE = "de.perfectban";
-
     private static PerfectBan instance;
 
     private EntityManager entityManager;
@@ -50,6 +48,8 @@ public class PerfectBan extends Plugin
         SessionFactory sessionFactory = configuration.buildSessionFactory();
         entityManager = sessionFactory.createEntityManager();
 
+        // bungeecord start
+
         // setup commands
         this.getProxy().getPluginManager().registerCommand(this, new BanCommand(
             ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_COMMAND),
@@ -58,11 +58,16 @@ public class PerfectBan extends Plugin
 
         // setup listeners
         this.getProxy().getPluginManager().registerListener(this, new PlayerJoinListener());
+
+
+        // bukkit start
+
+        // todo
     }
 
     @Override
     public void onDisable() {
-        
+        // todo
     }
 
     public static PerfectBan getInstance() {

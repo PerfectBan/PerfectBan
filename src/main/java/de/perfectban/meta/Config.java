@@ -23,6 +23,7 @@ public class Config
     public static final String ERROR_PLAYER_NOT_FOUND = "error.player_not_found";
     public static final String ERROR_BAN_PLAYER_NOT_BANNED = "error.ban.player_not_banned";
     public static final String ERROR_BAN_PLAYER_BANNED = "error.ban.player_banned";
+    public static final String ERROR_BAN_TIME = "error.ban.arguments_time";
 
     // DATABASE
     public static final String DATABASE_HOST = "database.host";
