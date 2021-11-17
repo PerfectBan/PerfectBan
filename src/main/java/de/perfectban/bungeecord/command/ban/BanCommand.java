@@ -61,14 +61,16 @@ public class BanCommand extends Command implements CommandInterface
     }
 
     @Override
-    public HashMap<Integer, List<String>> getTabCompletions(CommandSender commandSender, String[] typedArguments) {
+    public HashMap<Integer, List<String>> getTabCompletions(String[] typedArguments) {
         return null;
     }
 
     @Override
     public String getDescription() {
-        return Placeholder.replace(ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION),
-                new HashMap<>());
+        return Placeholder.replace(
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION),
+            new HashMap<>()
+        );
     }
 
     private UUID getModerator(CommandSender commandSender) {

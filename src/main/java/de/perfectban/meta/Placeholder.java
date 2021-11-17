@@ -4,13 +4,9 @@ import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
 
 import java.util.HashMap;
-import java.util.Objects;
 
-/**
- * @author Christian Tschörner
- */
-public enum Placeholder {
-
+public enum Placeholder
+{
     PREFIX(ConfigManager.getString(ConfigType.MESSAGES, Config.PREFIX)),
     PLAYER(null),
     ID(null),
@@ -21,7 +17,7 @@ public enum Placeholder {
 
     private final String defaultValue;
 
-    Placeholder(String defaultValue){
+    Placeholder(String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
@@ -29,20 +25,20 @@ public enum Placeholder {
         return defaultValue;
     }
 
-    public String getTemplate(){
+    public String getTemplate() {
         return String.format("{%s}", this);
     }
 
-    public static String replace(String message, HashMap<Placeholder, Object> replacements){
+    public static String replace(String message, HashMap<Placeholder, Object> replacements) {
         for(Placeholder placeholder : Placeholder.values()){
             String template = placeholder.getTemplate();
             String defaultValue = placeholder.getDefaultValue();
 
-            if(defaultValue != null){
+            if (defaultValue != null) {
                 message = message.replace(template, defaultValue);
             }
 
-            if(replacements.containsKey(placeholder)){
+            if (replacements.containsKey(placeholder)) {
                 message = message.replace(template, replacements.get(placeholder).toString());
             }
         }

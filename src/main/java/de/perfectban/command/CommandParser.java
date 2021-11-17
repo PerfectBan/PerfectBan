@@ -57,6 +57,7 @@ public class CommandParser
             Character last = argument.charAt(argument.length() - 1);
             String number = argument.substring(0, argument.length() - 1);
 
+            // todo: find way to check if string is number without try/catch
             try {
                 int value = Integer.parseInt(number);
 
