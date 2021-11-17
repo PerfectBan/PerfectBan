@@ -6,11 +6,12 @@ import de.perfectban.bungeecord.config.ConfigType;
 import de.perfectban.database.entity.Ban;
 import de.perfectban.database.repository.BanRepository;
 import de.perfectban.meta.Config;
-import de.perfectban.util.PlaceholderManager;
+import de.perfectban.meta.Placeholder;
 import de.perfectban.util.TimeManager;
 import de.perfectban.util.UUIDFetcher;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -45,16 +46,21 @@ public class BanCommandHelper
             List<Ban> bans = repository.getBans(uuid);
 
             if (!bans.isEmpty()) {
-                callback.accept(PlaceholderManager.replacePrefix(
-                        ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED)
-                ));
+                callback.accept(Placeholder.replace(
+                        ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
+                        new HashMap<>())
+                );
+
                 return;
             }
 
             // ban player
             Ban ban = repository.createBan(uuid, reason, until, permanent, false, moderator);
 
-            callback.accept(PlaceholderManager.replaceBanPlaceholders(ConfigManager.getString(ConfigType.MESSAGES, "banned"), ban, player));
+            String message = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, "banned"),
+                    getBanReplacements(player, ban));
+
+            callback.accept(message);
         });
     }
 
@@ -78,17 +84,19 @@ public class BanCommandHelper
             repository.deleteBan(ban.getId(), moderator);
 
             // broadcast to moderators
+            HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
+
             if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                String message = PlaceholderManager.replaceBanPlaceholders(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban, player
+                String message = Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE),
+                    replacements
                 );
                 // todo: broadcast
             }
 
-            callback.accept(PlaceholderManager.replaceBanPlaceholders(
-                ConfigManager.getString(ConfigType.MESSAGES, "deleted"),
-                bans.get(0), player
-            ));
+            String message = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, "deleted"),
+                    replacements);
+            callback.accept(message);
         });
     }
 
@@ -119,18 +127,21 @@ public class BanCommandHelper
                 repository.editBan(ban.getId(), reason, null, permanent, moderator);
             }
 
+            HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
+
             // broadcast to moderators
             if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
-                String message = PlaceholderManager.replaceBanPlaceholders(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban, player
+                String message = Placeholder.replace(
+                        ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE),
+                        replacements
                 );
+
                 // todo: broadcast
             }
 
-            callback.accept(PlaceholderManager.replaceBanPlaceholders(
-                ConfigManager.getString(ConfigType.MESSAGES, "changed"),
-                bans.get(0), player
-            ));
+            String message = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, "changed"),
+                    replacements);
+            callback.accept(message);
         });
     }
 
@@ -149,7 +160,28 @@ public class BanCommandHelper
                 return;
             }
 
-            callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO));
+            String message = Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO),
+                    getBanReplacements(player, bans.get(0)));
+
+            callback.accept(message);
         });
+    }
+
+    private HashMap<Placeholder, Object> getBanReplacements(String player, Ban ban){
+        //prepare ban message
+        HashMap<Placeholder, Object> replacements = new HashMap<>();
+        replacements.put(Placeholder.ID, ban.getId());
+        replacements.put(Placeholder.REASON, ban.getReason());
+        replacements.put(Placeholder.BANNED_BY, ban.getModerator() == null ? "console " : ban.getModerator());
+        replacements.put(Placeholder.PLAYER, player);
+        replacements.put(Placeholder.UNTIL, ban.getUntil() == null
+                ? "N/A"
+                : ban.getUntil().toLocaleString());
+        replacements.put(Placeholder.TIME_LEFT, ban.isLifetime()
+                ? "Forever"
+                : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis()));
+
+        return replacements;
     }
 }
