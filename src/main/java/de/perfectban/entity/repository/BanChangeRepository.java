@@ -15,7 +15,7 @@ public class BanChangeRepository
         this.entityManager = entityManager;
     }
 
-    public BanChange createChange(Ban ban, String reason, Timestamp until, Boolean lifetime, String moderator) {
+    public BanChange createChange(Ban ban, String reason, Timestamp until, Boolean lifetime, String moderator, String action) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -24,18 +24,16 @@ public class BanChangeRepository
 
         banChange.setBan(ban);
         banChange.setModerator(moderator);
+        banChange.setAction(action);
 
         banChange.setReasonFrom(ban.getReason());
         banChange.setReasonTo(reason);
-        banChange.setReasonChanged(reason != null && !reason.equals(ban.getReason()));
 
         banChange.setUntilFrom(ban.getUntil());
         banChange.setUntilTo(until);
-        banChange.setUntilChanged(until != null && until.getTime() != ban.getUntil().getTime());
 
         banChange.setLifetimeFrom(ban.isLifetime());
         banChange.setLifetimeTo(lifetime);
-        banChange.setLifetimeChanged(lifetime != null && lifetime != ban.isLifetime());
 
         entityManager.persist(banChange);
         entityManager.flush();

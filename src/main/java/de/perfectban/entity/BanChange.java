@@ -20,17 +20,11 @@ public class BanChange
     @Column(name = "reason_to", columnDefinition = "text null")
     private String reasonTo;
 
-    @Column(name = "reason_changed", columnDefinition = "boolean")
-    private boolean reasonChanged;
-
     @Column(name = "until_from", columnDefinition = "timestamp null")
     private Timestamp untilFrom;
 
     @Column(name = "until_to", columnDefinition = "timestamp null")
     private Timestamp untilTo;
-
-    @Column(name = "until_changed", columnDefinition = "boolean")
-    private boolean untilChanged;
 
     @Column(name = "lifetime_from", columnDefinition = "boolean")
     private Boolean lifetimeFrom;
@@ -38,11 +32,11 @@ public class BanChange
     @Column(name = "lifetime_to", columnDefinition = "boolean")
     private Boolean lifetimeTo;
 
-    @Column(name = "lifetime_changed", columnDefinition = "boolean")
-    private boolean lifetimeChanged;
-
-    @Column(name = "moderator", columnDefinition = "varchar(64) not null")
+    @Column(name = "moderator", columnDefinition = "varchar(64) null")
     private String moderator;
+
+    @Column(name = "action", columnDefinition = "varchar(16) null")
+    private String action;
 
     @Column(name = "created", columnDefinition = "timestamp default CURRENT_TIMESTAMP()")
     private Timestamp created;
@@ -85,15 +79,6 @@ public class BanChange
         return this;
     }
 
-    public boolean isReasonChanged() {
-        return reasonChanged;
-    }
-
-    public BanChange setReasonChanged(boolean reasonChanged) {
-        this.reasonChanged = reasonChanged;
-        return this;
-    }
-
     public Timestamp getUntilFrom() {
         return untilFrom;
     }
@@ -112,16 +97,7 @@ public class BanChange
         return this;
     }
 
-    public boolean isUntilChanged() {
-        return untilChanged;
-    }
-
-    public BanChange setUntilChanged(boolean untilChanged) {
-        this.untilChanged = untilChanged;
-        return this;
-    }
-
-    public Boolean isLifetimeFrom() {
+    public Boolean getLifetimeFrom() {
         return lifetimeFrom;
     }
 
@@ -130,21 +106,12 @@ public class BanChange
         return this;
     }
 
-    public Boolean isLifetimeTo() {
+    public Boolean getLifetimeTo() {
         return lifetimeTo;
     }
 
     public BanChange setLifetimeTo(Boolean lifetimeTo) {
         this.lifetimeTo = lifetimeTo;
-        return this;
-    }
-
-    public boolean isLifetimeChanged() {
-        return lifetimeChanged;
-    }
-
-    public BanChange setLifetimeChanged(boolean lifetimeChanged) {
-        this.lifetimeChanged = lifetimeChanged;
         return this;
     }
 
@@ -154,6 +121,15 @@ public class BanChange
 
     public BanChange setModerator(String moderator) {
         this.moderator = moderator;
+        return this;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public BanChange setAction(String action) {
+        this.action = action;
         return this;
     }
 

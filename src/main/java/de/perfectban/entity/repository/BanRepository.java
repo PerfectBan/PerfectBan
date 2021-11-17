@@ -56,12 +56,16 @@ public class BanRepository
     }
 
     public void editBan(int id, String reason, Timestamp until, Boolean lifetime, String moderator) {
-        EntityTransaction transaction = entityManager.getTransaction();
-
         Ban ban = getBan(id);
 
+        if (ban == null) {
+            return;
+        }
+
         BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
-        banChangeRepository.createChange(ban, reason, until, lifetime, moderator);
+        banChangeRepository.createChange(ban, reason, until, lifetime, moderator, "edit");
+
+        EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
 
@@ -81,11 +85,16 @@ public class BanRepository
 
     }
 
-    public void deleteBan(int id) {
+    public void deleteBan(int id, String moderator) {
         Ban ban = getBan(id);
 
         if (ban == null) {
             return;
+        }
+
+        if (moderator != null) {
+            BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
+            banChangeRepository.createChange(ban, null, null, null, moderator, "delete");
         }
 
         EntityTransaction transaction = entityManager.getTransaction();
