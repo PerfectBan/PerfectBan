@@ -1,7 +1,7 @@
-package de.perfectban.entity.repository;
+package de.perfectban.database.repository;
 
-import de.perfectban.entity.Ban;
-import de.perfectban.entity.BanChange;
+import de.perfectban.database.entity.Ban;
+import de.perfectban.database.entity.BanChange;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;

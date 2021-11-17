@@ -1,13 +1,13 @@
 package de.perfectban;
 
-import de.perfectban.command.ban.BanCommand;
-import de.perfectban.config.ConfigManager;
-import de.perfectban.config.ConfigType;
-import de.perfectban.entity.Ban;
-import de.perfectban.entity.BanChange;
-import de.perfectban.entity.Blocklist;
-import de.perfectban.entity.Mute;
-import de.perfectban.event.bungeecord.PlayerJoinListener;
+import de.perfectban.bungeecord.command.ban.BanCommand;
+import de.perfectban.bungeecord.config.ConfigManager;
+import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.database.entity.Ban;
+import de.perfectban.database.entity.BanChange;
+import de.perfectban.database.entity.Blocklist;
+import de.perfectban.database.entity.Mute;
+import de.perfectban.bungeecord.event.PlayerJoinListener;
 import de.perfectban.meta.Config;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.hibernate.SessionFactory;

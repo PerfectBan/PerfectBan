@@ -1,4 +1,4 @@
-package de.perfectban.entity;
+package de.perfectban.database.entity;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
