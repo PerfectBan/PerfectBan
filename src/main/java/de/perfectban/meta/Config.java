@@ -15,15 +15,20 @@ public class Config
 
     // MESSAGES
     public static final String PREFIX = "prefix";
+    public static final String PERMANENT = "permanent";
+    public static final String CONSOLE = "console";
     public static final String BAN_MESSAGE = "ban.ban_message";
-    public static final String BAN_COMMAND_TEMPLATE_INFO = "ban.command.templates.info";
     public static final String BAN_COMMAND_BROADCAST_CREATE = "ban.command.broadcast.create";
     public static final String BAN_COMMAND_BROADCAST_CHANGE = "ban.command.broadcast.change";
     public static final String BAN_COMMAND_BROADCAST_DELETE = "ban.command.broadcast.delete";
+    public static final String BAN_COMMAND_BAN_CREATE = "ban.command.create";
+    public static final String BAN_COMMAND_BAN_CHANGE = "ban.command.change";
+    public static final String BAN_COMMAND_BAN_DELETE = "ban.command.delete";
+    public static final String BAN_COMMAND_BAN_INFO = "ban.command.info";
     public static final String ERROR_PLAYER_NOT_FOUND = "error.player_not_found";
     public static final String ERROR_BAN_PLAYER_NOT_BANNED = "error.ban.player_not_banned";
     public static final String ERROR_BAN_PLAYER_BANNED = "error.ban.player_banned";
-    public static final String ERROR_BAN_TIME = "error.ban.arguments_time";
+    public static final String ERROR_BAN_REASON = "error.ban.reason_required";
 
     // DATABASE
     public static final String DATABASE_HOST = "database.host";
@@ -31,4 +36,7 @@ public class Config
     public static final String DATABASE_DATABASE = "database.database";
     public static final String DATABASE_USERNAME = "database.username";
     public static final String DATABASE_PASSWORD = "database.password";
+
+    // SETTINGS
+    public static final String USE_BROADCAST = "broadcast.use";
 }

@@ -1,1 +1,2 @@
-useBroadcast: "false"
+broadcast:
+  use: true

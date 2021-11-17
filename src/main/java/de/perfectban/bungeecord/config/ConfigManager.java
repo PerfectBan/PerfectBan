@@ -11,10 +11,11 @@ import java.nio.file.Files;
 public class ConfigManager
 {
     static {
-        PerfectBan.getInstance().getDataFolder().mkdirs();
-
-        //initalize all configs
         try {
+            if (!PerfectBan.getInstance().getDataFolder().mkdirs()) {
+                throw new IOException("Failed creating config folders");
+            }
+
             for (ConfigType configType : ConfigType.values()) {
                 createConfig(configType);
             }
