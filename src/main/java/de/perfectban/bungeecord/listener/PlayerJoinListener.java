@@ -45,18 +45,29 @@ public class PlayerJoinListener implements Listener
             return;
         }
 
-        //prepare ban message
+        // prepare ban message
         HashMap<Placeholder, Object> replacements = new HashMap<>();
         replacements.put(Placeholder.ID, ban.getId());
         replacements.put(Placeholder.REASON, ban.getReason());
-        replacements.put(Placeholder.BANNED_BY, ban.getModerator() == null ? "console" : ban.getModerator());
         replacements.put(Placeholder.PLAYER, event.getConnection().getName());
-        replacements.put(Placeholder.UNTIL, ban.getUntil() == null
-                ? "N/A"
-                : ban.getUntil().toLocaleString());
-        replacements.put(Placeholder.TIME_LEFT, ban.isLifetime()
-                ? "Forever"
-                : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis()));
+        replacements.put(
+                Placeholder.UNTIL,
+                ban.getUntil() == null
+                        ? ConfigManager.getString(ConfigType.MESSAGES, "forever")
+                        : ban.getUntil().toLocalDateTime().toString()
+        );
+        replacements.put(
+                Placeholder.BANNED_BY,
+                ban.getModerator() == null
+                        ? ConfigManager.getString(ConfigType.MESSAGES, "console")
+                        : ban.getModerator()
+        );
+        replacements.put(
+                Placeholder.TIME_LEFT,
+                ban.isLifetime()
+                        ? ConfigManager.getString(ConfigType.MESSAGES, "forever")
+                        : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis())
+        );
 
         String banMessage = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
                 replacements);

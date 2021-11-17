@@ -29,13 +29,19 @@ public class BanCommandHelper
     public void ban(String player, String reason, String time, boolean permanent, UUID moderator, Consumer<String> callback) {
         UUIDFetcher.getUUIDbyName(player, uuid -> {
             if (uuid == null) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                    new HashMap<>()
+                ));
                 return;
             }
 
             // check if reason and time is set
             if (reason == null || (time == null && !permanent)) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_TIME));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_TIME),
+                    new HashMap<>()
+                ));
                 return;
             }
 
@@ -47,34 +53,39 @@ public class BanCommandHelper
 
             if (!bans.isEmpty()) {
                 callback.accept(Placeholder.replace(
-                        ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
-                        new HashMap<>())
-                );
-
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
+                    new HashMap<>()
+                ));
                 return;
             }
 
             // ban player
             Ban ban = repository.createBan(uuid, reason, until, permanent, false, moderator);
 
-            String message = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, "banned"),
-                    getBanReplacements(player, ban));
-
-            callback.accept(message);
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, "banned"),
+                getBanReplacements(player, ban)
+            ));
         });
     }
 
     public void deleteBan(String player, String reason, UUID moderator, Consumer<String> callback) {
         UUIDFetcher.getUUIDbyName(player, uuid -> {
             if (uuid == null) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                    new HashMap<>()
+                ));
                 return;
             }
 
             List<Ban> bans = repository.getBans(uuid);
 
             if (bans.isEmpty()) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
+                    new HashMap<>()
+                ));
                 return;
             }
 
@@ -94,23 +105,30 @@ public class BanCommandHelper
                 // todo: broadcast
             }
 
-            String message = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, "deleted"),
-                    replacements);
-            callback.accept(message);
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, "deleted"),
+                replacements
+            ));
         });
     }
 
     public void changeBan(String player, String reason, String time, boolean permanent, UUID moderator, Consumer<String> callback) {
         UUIDFetcher.getUUIDbyName(player, uuid -> {
             if (uuid == null) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                    new HashMap<>()
+                ));
                 return;
             }
 
             List<Ban> bans = repository.getBans(uuid);
 
             if (bans.isEmpty()) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
+                    new HashMap<>()
+                ));
                 return;
             }
 
@@ -132,23 +150,27 @@ public class BanCommandHelper
             // broadcast to moderators
             if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
                 String message = Placeholder.replace(
-                        ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE),
-                        replacements
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE),
+                    replacements
                 );
 
                 // todo: broadcast
             }
 
-            String message = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, "changed"),
-                    replacements);
-            callback.accept(message);
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, "changed"),
+                replacements
+            ));
         });
     }
 
     public void banInfo(String player, Consumer<String> callback) {
         UUIDFetcher.getUUIDbyName(player, uuid -> {
             if (uuid == null) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                    new HashMap<>()
+                ));
                 return;
             }
 
@@ -156,31 +178,43 @@ public class BanCommandHelper
 
             // todo: history
             if (bans.isEmpty()) {
-                callback.accept(ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED));
+                callback.accept(Placeholder.replace(
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
+                    new HashMap<>()
+                ));
                 return;
             }
 
-            String message = Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO),
-                    getBanReplacements(player, bans.get(0)));
-
-            callback.accept(message);
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_TEMPLATE_INFO),
+                getBanReplacements(player, bans.get(0))
+            ));
         });
     }
 
-    private HashMap<Placeholder, Object> getBanReplacements(String player, Ban ban){
-        //prepare ban message
+    private HashMap<Placeholder, Object> getBanReplacements(String player, Ban ban) {
         HashMap<Placeholder, Object> replacements = new HashMap<>();
         replacements.put(Placeholder.ID, ban.getId());
         replacements.put(Placeholder.REASON, ban.getReason());
-        replacements.put(Placeholder.BANNED_BY, ban.getModerator() == null ? "console " : ban.getModerator());
         replacements.put(Placeholder.PLAYER, player);
-        replacements.put(Placeholder.UNTIL, ban.getUntil() == null
-                ? "N/A"
-                : ban.getUntil().toLocaleString());
-        replacements.put(Placeholder.TIME_LEFT, ban.isLifetime()
-                ? "Forever"
-                : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis()));
+        replacements.put(
+                Placeholder.UNTIL,
+                ban.getUntil() == null
+                    ? ConfigManager.getString(ConfigType.MESSAGES, "forever")
+                    : ban.getUntil().toLocalDateTime().toString()
+        );
+        replacements.put(
+            Placeholder.BANNED_BY,
+            ban.getModerator() == null
+                ? ConfigManager.getString(ConfigType.MESSAGES, "console")
+                : ban.getModerator()
+        );
+        replacements.put(
+            Placeholder.TIME_LEFT,
+            ban.isLifetime()
+                ? ConfigManager.getString(ConfigType.MESSAGES, "forever")
+                : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis())
+        );
 
         return replacements;
     }
