@@ -96,7 +96,7 @@ public class BanCommand extends Command implements CommandInterface
                     Ban ban = bans.get(0);
 
                     // soft delete ban
-                    repository.deleteBan(ban.getId());
+                    repository.deleteBan(ban.getId(), moderator);
 
                     // broadcast to moderators
                     if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
