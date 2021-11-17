@@ -1,13 +1,23 @@
 package de.perfectban.util;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class TimeManager
 {
-    private final HashMap<String, Long> cache;
+    private final LinkedHashMap<Character, Long> timeKeys;
+    private final LinkedHashMap<String, Long> cache;
 
     public TimeManager() {
-        this.cache = new HashMap<>();
+        this.cache = new LinkedHashMap<>();
+        this.timeKeys = new LinkedHashMap<>();
+
+        this.timeKeys.put('y', 31556952000L);
+        this.timeKeys.put('M', 2629746000L);
+        this.timeKeys.put('w', 604800000L);
+        this.timeKeys.put('d', 86400000L);
+        this.timeKeys.put('h', 3600000L);
+        this.timeKeys.put('m', 60000L);
+        this.timeKeys.put('s', 1000L);
     }
 
     public long convertToMillis(String time) {
@@ -15,28 +25,19 @@ public class TimeManager
             return 0;
         }
 
-        // cache
         if (cache.containsKey(time)) {
             return cache.get(time);
         }
 
         String[] split = time.split("/\\s/");
-
         long millis = 0L;
 
         for (String value : split) {
             int number = Integer.parseInt(value.substring(0, value.length() - 1));
+            Character last = value.charAt(value.length() - 1);
 
-            if (value.endsWith("s")) {
-                millis += 1000L * number;
-            } else if (value.endsWith("m")) {
-                millis += 60000L * number;
-            } else if (value.endsWith("h")) {
-                millis += 3600000L * number;
-            } else if (value.endsWith("d")) {
-                millis += 86400000L * number;
-            } else if (value.endsWith("w")) {
-                millis += 604800000L * number;
+            if (timeKeys.containsKey(last)) {
+                millis += timeKeys.get(last) * number;
             }
         }
 
@@ -45,50 +46,36 @@ public class TimeManager
         return millis;
     }
 
-    public String convertToString(long diff) {
-        int days = 0, hours = 0, minutes = 0, seconds = 0;
+    public String convertToTimeString(long diff) {
+        LinkedHashMap<Character, Integer> values = new LinkedHashMap<>();
 
-        while (diff >= 86400000L) {
-            diff -= 86400000L;
-            days ++;
+        for(Map.Entry<Character, Long> entry : timeKeys.entrySet()) {
+            Character key = entry.getKey();
+            Long value = entry.getValue();
+
+            int counter = 0;
+
+            while (diff >= value) {
+                diff -= value;
+                counter ++;
+            }
+
+            values.put(key, counter);
         }
 
-        while (diff >= 3600000L) {
-            diff -= 3600000L;
-            hours ++;
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for(Map.Entry<Character, Integer> entry : values.entrySet()) {
+            Character key = entry.getKey();
+            Integer value = entry.getValue();
+
+            if (value > 0) {
+                stringBuilder
+                    .append(stringBuilder.toString().isEmpty() ? "" : " ")
+                    .append(value).append(key);
+            }
         }
 
-        while (diff >= 60000L) {
-            diff -= 60000L;
-            minutes ++;
-        }
-
-        while (diff >= 1000L) {
-            diff -= 1000L;
-            seconds ++;
-        }
-
-        if (days == 0 && hours == 0) {
-            return String.format(
-                "%s minute%s, %s second%s",
-                minutes, (minutes != 1 ? "s" : ""),
-                seconds, (seconds != 1 ? "s" : "")
-            );
-        }
-
-        if (days == 0) {
-            return String.format(
-                "%s hour%s, %s minute%s",
-                hours, (hours != 1 ? "s" : ""),
-                minutes, (minutes != 1 ? "s" : "")
-            );
-        }
-
-        return String.format(
-            "%s day%s, %s hour%s, %s minute%s",
-            days, (days != 1 ? "s" : ""),
-            hours, (hours != 1 ? "s" : ""),
-            minutes, (minutes != 1 ? "s" : "")
-        );
+        return stringBuilder.toString();
     }
 }

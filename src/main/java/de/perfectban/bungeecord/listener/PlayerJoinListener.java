@@ -13,7 +13,6 @@ import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-import java.sql.Timestamp;
 import java.util.*;
 
 public class PlayerJoinListener implements Listener
@@ -53,20 +52,20 @@ public class PlayerJoinListener implements Listener
         replacements.put(
                 Placeholder.UNTIL,
                 ban.getUntil() == null
-                        ? ConfigManager.getString(ConfigType.MESSAGES, "forever")
+                        ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
                         : ban.getUntil().toLocalDateTime().toString()
         );
         replacements.put(
                 Placeholder.BANNED_BY,
                 ban.getModerator() == null
-                        ? ConfigManager.getString(ConfigType.MESSAGES, "console")
+                        ? ConfigManager.getString(ConfigType.MESSAGES, Config.CONSOLE)
                         : ban.getModerator()
         );
         replacements.put(
                 Placeholder.TIME_LEFT,
                 ban.isLifetime()
-                        ? ConfigManager.getString(ConfigType.MESSAGES, "forever")
-                        : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis())
+                        ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
+                        : new TimeManager().convertToTimeString(ban.getUntil().getTime() - System.currentTimeMillis())
         );
 
         String banMessage = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),

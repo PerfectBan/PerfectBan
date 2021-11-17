@@ -1,4 +1,6 @@
 prefix: "§b§lPerfectBan §8|§f"
+permanent: "§4§lPERMANENT"
+console: "§4S:H:I:E:L:D"
 ban:
   ban_message: |
     §cYou were banned from §4§lexample.com§c!
@@ -10,20 +12,37 @@ ban:
 
     §eFor more information visit §b§lexample.com/unban
   command:
-    templates:
-      info: |
-        {PREFIX} Information about §e{PLAYER}
-        {PREFIX} §8=========================
-        {PREFIX} Id: §e{ID}
-        {PREFIX} Reason: §e{REASON}
-        {PREFIX} Until: §e{UNTIL}
-        {PREFIX} Time left: §e{TIME_LEFT}
     broadcast:
-      create: "{PREFIX} Player {PLAYER} was banned for {REASON} from {BANNED_BY}"
-      change: "{PREFIX} Ban with id {ID} ({PLAYER}) was changed by {BANNED_BY}"
-      delete: "{PREFIX} Ban with id {ID} ({PLAYER}) was deleted by {BANNED_BY}"
+      create: |
+        {PREFIX} {BANNED_BY} banned §e{PLAYER}
+        {PREFIX} Reason: §e{REASON} §f- Time: {TIME_LEFT}
+      change: |
+        {PREFIX} {BANNED_BY} changed ban of §e{PLAYER}
+        {PREFIX} Reason: §e{REASON} §f- Time: {TIME_LEFT}
+      delete: |
+        {PREFIX} {BANNED_BY} deleted ban of §e{PLAYER}
+        {PREFIX} Reason: §e{REASON}
+    info: |
+      {PREFIX} Information about §e{PLAYER}
+      {PREFIX} §8=========================
+      {PREFIX} Id: §e{ID}
+      {PREFIX} Reason: §e{REASON}
+      {PREFIX} Until: §e{UNTIL}
+      {PREFIX} Time left: §e{TIME_LEFT}
+      {PREFIX} Moderator: §e{BANNED_BY}
+    create: |
+      {PREFIX} Succesfully banned §e{PLAYER}
+      {PREFIX} Reason: §e{REASON} §f- Time: {TIME_LEFT}
+    change: |
+      {PREFIX} Succesfully changed ban of §e{PLAYER}
+      {PREFIX} Reason: §e{REASON} §f- Time: {TIME_LEFT}
+    delete: |
+      {PREFIX} Succesfully deleted ban of §e{PLAYER}
+      {PREFIX} Reason: §e{REASON}
+
 error:
   player_not_found: "{PREFIX} §cThis player has not been found"
   ban:
     player_not_banned: "{PREFIX} §cThis player is not banned"
     player_banned: "{PREFIX} §cThis player is already banned"
+    reason_required: "{PREFIX} §cYou have to provide a reason to create a ban"

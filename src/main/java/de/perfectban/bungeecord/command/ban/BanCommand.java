@@ -8,6 +8,7 @@ import de.perfectban.command.helper.BanCommandHelper;
 import de.perfectban.meta.Config;
 import de.perfectban.meta.Placeholder;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -50,13 +51,17 @@ public class BanCommand extends Command implements CommandInterface
         boolean permanent = (time == null || time.isEmpty());
 
         if (args.length >= 2 && action.equalsIgnoreCase("info")) {
-            banCommandHelper.banInfo(args[1], commandSender::sendMessage);
+            banCommandHelper.banInfo(args[1],
+                    message -> commandSender.sendMessage(new TextComponent(message)));
         } else if (args.length >= 2 && action.equalsIgnoreCase("delete")) {
-            banCommandHelper.deleteBan(args[1], reason, moderator, commandSender::sendMessage);
+            banCommandHelper.deleteBan(args[1], reason, moderator,
+                    message -> commandSender.sendMessage(new TextComponent(message)));
         } else if (args.length >= 2 && action.equalsIgnoreCase("change")) {
-            banCommandHelper.changeBan(args[1], reason, time, permanent, moderator, commandSender::sendMessage);
+            banCommandHelper.changeBan(args[1], reason, time, permanent, moderator,
+                    message -> commandSender.sendMessage(new TextComponent(message)));
         } else {
-            banCommandHelper.ban(args[0], reason, time, permanent, moderator, commandSender::sendMessage);
+            banCommandHelper.ban(args[0], reason, time, permanent, moderator,
+                    message -> commandSender.sendMessage(new TextComponent(message)));
         }
     }
 
