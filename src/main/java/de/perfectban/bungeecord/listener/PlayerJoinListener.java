@@ -1,4 +1,4 @@
-package de.perfectban.bungeecord.event;
+package de.perfectban.bungeecord.listener;
 
 import de.perfectban.PerfectBan;
 import de.perfectban.bungeecord.config.ConfigManager;
@@ -6,15 +6,15 @@ import de.perfectban.bungeecord.config.ConfigType;
 import de.perfectban.database.entity.Ban;
 import de.perfectban.database.repository.BanRepository;
 import de.perfectban.meta.Config;
-import de.perfectban.util.PlaceholderManager;
+import de.perfectban.meta.Placeholder;
+import de.perfectban.util.TimeManager;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class PlayerJoinListener implements Listener
 {
@@ -45,9 +45,22 @@ public class PlayerJoinListener implements Listener
             return;
         }
 
-        String banMessage = PlaceholderManager.replaceBanPlaceholders(
-            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE), ban, event.getConnection().getName()
-        );
+        //prepare ban message
+        HashMap<Placeholder, Object> replacements = new HashMap<>();
+        replacements.put(Placeholder.ID, ban.getId());
+        replacements.put(Placeholder.REASON, ban.getReason());
+        replacements.put(Placeholder.BANNED_BY, ban.getModerator() == null ? "console" : ban.getModerator());
+        replacements.put(Placeholder.PLAYER, event.getConnection().getName());
+        replacements.put(Placeholder.UNTIL, ban.getUntil() == null
+                ? "N/A"
+                : ban.getUntil().toLocaleString());
+        replacements.put(Placeholder.TIME_LEFT, ban.isLifetime()
+                ? "Forever"
+                : new TimeManager().convertToString(ban.getUntil().getTime() - System.currentTimeMillis()));
+
+        String banMessage = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
+                replacements);
+
 
         // disallow player from joining
         event.setCancelled(true);

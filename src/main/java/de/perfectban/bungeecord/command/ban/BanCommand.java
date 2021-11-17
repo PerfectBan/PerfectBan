@@ -1,14 +1,13 @@
 package de.perfectban.bungeecord.command.ban;
 
-import de.perfectban.command.CommandInterface;
 import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.command.CommandInterface;
 import de.perfectban.command.CommandParser;
 import de.perfectban.command.helper.BanCommandHelper;
 import de.perfectban.meta.Config;
-import de.perfectban.util.PlaceholderManager;
+import de.perfectban.meta.Placeholder;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
@@ -32,7 +31,7 @@ public class BanCommand extends Command implements CommandInterface
     public void execute(CommandSender commandSender, String[] args) {
         if (args.length == 0) {
             // send help
-            commandSender.sendMessage(new TextComponent(getDescription()));
+            commandSender.sendMessage(getDescription());
             return;
         }
 
@@ -51,22 +50,13 @@ public class BanCommand extends Command implements CommandInterface
         boolean permanent = (time == null || time.isEmpty());
 
         if (args.length >= 2 && action.equalsIgnoreCase("info")) {
-            String player = args[1];
-
-            banCommandHelper.banInfo(player, message -> commandSender.sendMessage(new TextComponent(message)));
+            banCommandHelper.banInfo(args[1], commandSender::sendMessage);
         } else if (args.length >= 2 && action.equalsIgnoreCase("delete")) {
-            String player = args[1];
-
-            banCommandHelper.deleteBan(player, reason, moderator, message -> commandSender.sendMessage(new TextComponent(message)));
+            banCommandHelper.deleteBan(args[1], reason, moderator, commandSender::sendMessage);
         } else if (args.length >= 2 && action.equalsIgnoreCase("change")) {
-            String player = args[1];
-
-            banCommandHelper.changeBan(player, reason, time, permanent, moderator, message -> commandSender.sendMessage(new TextComponent(message)));
+            banCommandHelper.changeBan(args[1], reason, time, permanent, moderator, commandSender::sendMessage);
         } else {
-            // this should be username or random
-            String player = args[0];
-
-            banCommandHelper.ban(player, reason, time, permanent, moderator, message -> commandSender.sendMessage(new TextComponent(message)));
+            banCommandHelper.ban(args[0], reason, time, permanent, moderator, commandSender::sendMessage);
         }
     }
 
@@ -77,9 +67,8 @@ public class BanCommand extends Command implements CommandInterface
 
     @Override
     public String getDescription() {
-        return PlaceholderManager.replacePrefix(
-            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION)
-        );
+        return Placeholder.replace(ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION),
+                new HashMap<>());
     }
 
     private UUID getModerator(CommandSender commandSender) {

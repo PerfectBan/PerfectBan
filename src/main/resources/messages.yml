@@ -6,7 +6,7 @@ ban:
     §f§lID #{ID}
 
     §b§lREASON: §f{REASON}
-    §b§lTIME LEFT: §f{TIME}
+    §b§lTIME LEFT: §f{TIME_LEFT}
 
     §eFor more information visit §b§lexample.com/unban
   command:
@@ -17,7 +17,7 @@ ban:
         {PREFIX} Id: §e{ID}
         {PREFIX} Reason: §e{REASON}
         {PREFIX} Until: §e{UNTIL}
-        {PREFIX} Time left: §e{TIME}
+        {PREFIX} Time left: §e{TIME_LEFT}
     broadcast:
       create: "{PREFIX} Player {PLAYER} was banned for {REASON} from {BANNED_BY}"
       change: "{PREFIX} Ban with id {ID} ({PLAYER}) was changed by {BANNED_BY}"
