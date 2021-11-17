@@ -13,7 +13,8 @@ public class PlaceholderManager {
         message = replacePrefix(message);
         message = message.replace("{ID}", String.valueOf(ban.getId()));
         message = message.replace("{REASON}", ban.getReason());
-        message = message.replace("{BANNED_BY}", ban.getModerator());
+        message = message.replace("{BANNED_BY}", ban.getModerator() == null
+                ? "console" : ban.getModerator());
         message = message.replace("{PLAYER}", player);
         message = message.replace("{UNTIL}", ban.getUntil() == null
             ? "N/A"

@@ -83,7 +83,6 @@ public class BanCommandHelper
                     ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban, player
                 );
                 // todo: broadcast
-                return;
             }
 
             callback.accept(PlaceholderManager.replaceBanPlaceholders(
@@ -123,15 +122,14 @@ public class BanCommandHelper
             // broadcast to moderators
             if (ConfigManager.getBoolean(ConfigType.CONFIG, "useBroadcast")) {
                 String message = PlaceholderManager.replaceBanPlaceholders(
-                        ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban, player
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE), ban, player
                 );
                 // todo: broadcast
-                return;
             }
 
             callback.accept(PlaceholderManager.replaceBanPlaceholders(
-                    ConfigManager.getString(ConfigType.MESSAGES, "changed"),
-                    bans.get(0), player
+                ConfigManager.getString(ConfigType.MESSAGES, "changed"),
+                bans.get(0), player
             ));
         });
     }

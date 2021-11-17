@@ -3,6 +3,7 @@ package de.perfectban.bungeecord.command.ban;
 import de.perfectban.command.CommandInterface;
 import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.command.CommandParser;
 import de.perfectban.command.helper.BanCommandHelper;
 import de.perfectban.meta.Config;
 import de.perfectban.util.PlaceholderManager;
@@ -17,11 +18,13 @@ import java.util.UUID;
 
 public class BanCommand extends Command implements CommandInterface
 {
+    private final CommandParser commandParser;
     private final BanCommandHelper banCommandHelper;
 
     public BanCommand(String name, String permission) {
         super(name, permission);
 
+        this.commandParser = new CommandParser();
         this.banCommandHelper = new BanCommandHelper();
     }
 
@@ -40,11 +43,12 @@ public class BanCommand extends Command implements CommandInterface
         // the player/console that issued the action
         UUID moderator = getModerator(commandSender);
 
-        // todo: command parser
+        // parse command arguments
+        String reason = commandParser.getReason(args);
+        String time = commandParser.getTime(args);
 
-        String reason = "";
-        String time = "";
-        boolean permanent = true;
+        // if no time provided -> default to permanent
+        boolean permanent = (time == null || time.isEmpty());
 
         if (args.length >= 2 && action.equalsIgnoreCase("info")) {
             String player = args[1];
