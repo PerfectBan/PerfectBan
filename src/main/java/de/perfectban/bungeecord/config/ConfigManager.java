@@ -1,7 +1,6 @@
-package de.perfectban.config;
+package de.perfectban.bungeecord.config;
 
 import de.perfectban.PerfectBan;
-import de.perfectban.util.PlaceholderManager;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;

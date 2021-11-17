@@ -1,11 +1,11 @@
-package de.perfectban.command.ban;
+package de.perfectban.bungeecord.command.ban;
 
 import de.perfectban.PerfectBan;
 import de.perfectban.command.CommandInterface;
-import de.perfectban.config.ConfigManager;
-import de.perfectban.config.ConfigType;
-import de.perfectban.entity.Ban;
-import de.perfectban.entity.repository.BanRepository;
+import de.perfectban.bungeecord.config.ConfigManager;
+import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.database.entity.Ban;
+import de.perfectban.database.repository.BanRepository;
 import de.perfectban.meta.Config;
 import de.perfectban.util.PlaceholderManager;
 import de.perfectban.util.TimeManager;

@@ -1,12 +1,10 @@
-package de.perfectban.entity.repository;
+package de.perfectban.database.repository;
 
-import de.perfectban.entity.Mute;
-import org.hibernate.Transaction;
+import de.perfectban.database.entity.Mute;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 

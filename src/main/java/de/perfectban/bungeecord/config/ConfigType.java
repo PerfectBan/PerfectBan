@@ -1,4 +1,4 @@
-package de.perfectban.config;
+package de.perfectban.bungeecord.config;
 
 public enum ConfigType
 {

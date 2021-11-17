@@ -1,8 +1,8 @@
 package de.perfectban.util;
 
-import de.perfectban.config.ConfigManager;
-import de.perfectban.config.ConfigType;
-import de.perfectban.entity.Ban;
+import de.perfectban.bungeecord.config.ConfigManager;
+import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.database.entity.Ban;
 import de.perfectban.meta.Config;
 
 public class PlaceholderManager {

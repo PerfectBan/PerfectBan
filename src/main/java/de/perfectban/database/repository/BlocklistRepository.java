@@ -1,11 +1,10 @@
-package de.perfectban.entity.repository;
+package de.perfectban.database.repository;
 
-import de.perfectban.entity.Blocklist;
+import de.perfectban.database.entity.Blocklist;
 import de.perfectban.exceptions.InvalidTypeException;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class BlocklistRepository
