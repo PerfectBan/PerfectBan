@@ -1,10 +1,23 @@
 package de.perfectban.util;
 
-public class TimeManager {
+import java.util.HashMap;
 
-    public static long convertToMillis(String time) {
+public class TimeManager
+{
+    private final HashMap<String, Long> cache;
+
+    public TimeManager() {
+        this.cache = new HashMap<>();
+    }
+
+    public long convertToMillis(String time) {
         if (time == null) {
             return 0;
+        }
+
+        // cache
+        if (cache.containsKey(time)) {
+            return cache.get(time);
         }
 
         String[] split = time.split("/\\s/");
@@ -27,10 +40,12 @@ public class TimeManager {
             }
         }
 
+        cache.put(time, millis);
+
         return millis;
     }
 
-    public static String convertToString(long diff) {
+    public String convertToString(long diff) {
         int days = 0, hours = 0, minutes = 0, seconds = 0;
 
         while (diff >= 86400000L) {
@@ -55,9 +70,9 @@ public class TimeManager {
 
         if (days == 0 && hours == 0) {
             return String.format(
-                    "%s minute%s, %s second%s",
-                    minutes, (minutes != 1 ? "s" : ""),
-                    seconds, (seconds != 1 ? "s" : "")
+                "%s minute%s, %s second%s",
+                minutes, (minutes != 1 ? "s" : ""),
+                seconds, (seconds != 1 ? "s" : "")
             );
         }
 
