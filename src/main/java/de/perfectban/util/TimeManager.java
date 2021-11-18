@@ -5,10 +5,8 @@ import java.util.*;
 public class TimeManager
 {
     private final LinkedHashMap<Character, Long> timeKeys;
-    private final LinkedHashMap<String, Long> cache;
 
     public TimeManager() {
-        this.cache = new LinkedHashMap<>();
         this.timeKeys = new LinkedHashMap<>();
 
         this.timeKeys.put('y', 31556952000L);
@@ -25,29 +23,23 @@ public class TimeManager
             return 0;
         }
 
-        if (cache.containsKey(time)) {
-            return cache.get(time);
-        }
-
         String[] split = time.split("/\\s/");
         long millis = 0L;
 
-        for (String value : split) {
-            int number = Integer.parseInt(value.substring(0, value.length() - 1));
-            Character last = value.charAt(value.length() - 1);
+        for (String argument : split) {
+            Character key = argument.charAt(argument.length() - 1);
+            Long value = Long.parseLong(argument.substring(0, argument.length() - 1));
 
-            if (timeKeys.containsKey(last)) {
-                millis += timeKeys.get(last) * number;
+            if (timeKeys.containsKey(key)) {
+                millis += timeKeys.get(key) * value;
             }
         }
-
-        cache.put(time, millis);
 
         return millis;
     }
 
     public String convertToTimeString(long diff) {
-        LinkedHashMap<Character, Integer> values = new LinkedHashMap<>();
+        LinkedHashMap<Character, Integer> counts = new LinkedHashMap<>();
 
         for(Map.Entry<Character, Long> entry : timeKeys.entrySet()) {
             Character key = entry.getKey();
@@ -60,22 +52,20 @@ public class TimeManager
                 counter ++;
             }
 
-            values.put(key, counter);
+            counts.put(key, counter);
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringJoiner joiner = new StringJoiner(" ");
 
-        for(Map.Entry<Character, Integer> entry : values.entrySet()) {
+        for(Map.Entry<Character, Integer> entry : counts.entrySet()) {
             Character key = entry.getKey();
             Integer value = entry.getValue();
 
             if (value > 0) {
-                stringBuilder
-                    .append(stringBuilder.toString().isEmpty() ? "" : " ")
-                    .append(value).append(key);
+                joiner.add(String.format("%s%s", value, key));
             }
         }
 
-        return stringBuilder.toString();
+        return joiner.toString();
     }
 }

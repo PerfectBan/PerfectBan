@@ -6,6 +6,13 @@ public class Config
     public static final String COMMAND_BAN_COMMAND = "ban.command";
     public static final String COMMAND_BAN_PERMISSION = "ban.permission";
     public static final String COMMAND_BAN_DESCRIPTION = "ban.description";
+    public static final String COMMAND_UNBAN_COMMAND = "unban.command";
+    public static final String COMMAND_UNBAN_PERMISSION = "unban.permission";
+    public static final String COMMAND_UNBAN_DESCRIPTION = "unban.description";
+    public static final String COMMAND_CHANGE_BAN_COMMAND = "change_ban.command";
+    public static final String COMMAND_CHANGE_BAN_PERMISSION = "change_ban.permission";
+    public static final String COMMAND_CHANGE_BAN_DESCRIPTION = "change_ban.description";
+
     public static final String COMMAND_MUTE_COMMAND = "mute.command";
     public static final String COMMAND_MUTE_PERMISSION = "mute.permission";
     public static final String COMMAND_MUTE_DESCRIPTION = "mute.description";

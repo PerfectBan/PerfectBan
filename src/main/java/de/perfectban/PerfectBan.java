@@ -1,6 +1,8 @@
 package de.perfectban;
 
 import de.perfectban.bungeecord.command.ban.BanCommand;
+import de.perfectban.bungeecord.command.ban.ChangeBanCommand;
+import de.perfectban.bungeecord.command.ban.UnbanCommand;
 import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
 import de.perfectban.database.entity.Ban;
@@ -54,6 +56,14 @@ public class PerfectBan extends Plugin
         this.getProxy().getPluginManager().registerCommand(this, new BanCommand(
             ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_COMMAND),
             ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_PERMISSION)
+        ));
+        this.getProxy().getPluginManager().registerCommand(this, new UnbanCommand(
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_UNBAN_COMMAND),
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_UNBAN_PERMISSION)
+        ));
+        this.getProxy().getPluginManager().registerCommand(this, new ChangeBanCommand(
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_CHANGE_BAN_COMMAND),
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_CHANGE_BAN_PERMISSION)
         ));
 
         // setup listeners

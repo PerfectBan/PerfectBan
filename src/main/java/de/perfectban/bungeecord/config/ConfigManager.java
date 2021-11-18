@@ -12,9 +12,7 @@ public class ConfigManager
 {
     static {
         try {
-            if (!PerfectBan.getInstance().getDataFolder().mkdirs()) {
-                throw new IOException("Failed creating config folders");
-            }
+            PerfectBan.getInstance().getDataFolder().mkdirs();
 
             for (ConfigType configType : ConfigType.values()) {
                 createConfig(configType);
@@ -29,7 +27,7 @@ public class ConfigManager
     }
 
     public static boolean getBoolean(ConfigType configType, String key) {
-        return Boolean.parseBoolean(getObject(configType, key).toString());
+        return Boolean.getBoolean(getObject(configType, key).toString());
     }
 
     public static int getInteger(ConfigType configType, String key) {
