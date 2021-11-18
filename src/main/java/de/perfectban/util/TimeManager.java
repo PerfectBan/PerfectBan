@@ -11,7 +11,6 @@ public class TimeManager
 
         this.timeKeys.put('y', 31556952000L);
         this.timeKeys.put('M', 2629746000L);
-        this.timeKeys.put('w', 604800000L);
         this.timeKeys.put('d', 86400000L);
         this.timeKeys.put('h', 3600000L);
         this.timeKeys.put('m', 60000L);
@@ -23,7 +22,7 @@ public class TimeManager
             return 0;
         }
 
-        String[] split = time.split("/\\s/");
+        String[] split = time.split(" ");
         long millis = 0L;
 
         for (String argument : split) {
