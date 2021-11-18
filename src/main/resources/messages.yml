@@ -5,10 +5,13 @@ ban:
   ban_message: |
     §cYou were banned from §4§lexample.com§c!
 
-    §f§lID #{ID}
 
     §b§lREASON: §f{REASON}
+
     §b§lTIME LEFT: §f{TIME_LEFT}
+
+    §b§lMODERATOR: §f{BANNED_BY}
+
 
     §eFor more information visit §b§lexample.com/unban
   command:

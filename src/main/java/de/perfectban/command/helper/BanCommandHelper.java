@@ -40,7 +40,7 @@ public class BanCommandHelper
             }
 
             // check if reason is set
-            if (reason == null) {
+            if (reason == null || reason.isEmpty()) {
                 callback.accept(Placeholder.replace(
                     ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_REASON),
                     new HashMap<>()

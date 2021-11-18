@@ -14,7 +14,6 @@ public class CommandParser
         this.timeKeys.put('m', 60000L);
         this.timeKeys.put('h', 3600000L);
         this.timeKeys.put('d', 86400000L);
-        this.timeKeys.put('w', 604800000L);
         this.timeKeys.put('M', 2629746000L);
         this.timeKeys.put('y', 31556952000L);
     }
@@ -23,7 +22,20 @@ public class CommandParser
         StringJoiner timeJoiner = new StringJoiner(" ");
         StringJoiner reasonJoiner = new StringJoiner(" ");
 
+        args = Arrays.copyOfRange(args, 1, args.length);
+
         Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+
+        for (String argument : args) {
+            Character last = argument.charAt(argument.length() - 1);
+            String number = argument.substring(0, argument.length() - 1);
+
+            if (pattern.matcher(number).matches() && timeKeys.containsKey(last)) {
+                break;
+            }
+
+            reasonJoiner.add(argument);
+        }
 
         String[] reversed = reverseArray(args);
 
@@ -36,17 +48,6 @@ public class CommandParser
             }
 
             timeJoiner.add(argument);
-        }
-
-        for (String argument : args) {
-            Character last = argument.charAt(argument.length() - 1);
-            String number = argument.substring(0, argument.length() - 1);
-
-            if (pattern.matcher(number).matches() && timeKeys.containsKey(last)) {
-                break;
-            }
-
-            reasonJoiner.add(argument);
         }
 
         return new CommandArguments(
