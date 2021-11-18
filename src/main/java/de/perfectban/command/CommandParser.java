@@ -1,6 +1,7 @@
 package de.perfectban.command;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class CommandParser
 {
@@ -18,58 +19,40 @@ public class CommandParser
         this.timeKeys.put('y', 31556952000L);
     }
 
-    public String getTime(String[] args) {
-        StringBuilder stringBuilder = new StringBuilder();
+    public CommandArguments getArguments(String[] args) {
+        StringJoiner timeJoiner = new StringJoiner(" ");
+        StringJoiner reasonJoiner = new StringJoiner(" ");
 
-        args = Arrays.copyOfRange(args, 1, args.length);
+        Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-        for (String argument : reverseArray(args)) {
+        String[] reversed = reverseArray(args);
+
+        for (String argument : reversed) {
             Character last = argument.charAt(argument.length() - 1);
             String number = argument.substring(0, argument.length() - 1);
 
-            try {
-                int value = Integer.parseInt(number);
-            } catch (NumberFormatException e) {
+            if (!pattern.matcher(number).matches() || !timeKeys.containsKey(last)) {
                 break;
             }
 
-            if (!timeKeys.containsKey(last)) {
-                break;
-            }
-
-            stringBuilder.append(stringBuilder.toString().equals("") ? "" : " ").append(argument);
+            timeJoiner.add(argument);
         }
-
-        // no time provided -> default
-        if (stringBuilder.toString().isEmpty()) {
-            return null;
-        }
-
-        return stringBuilder.toString();
-    }
-
-    public String getReason(String[] args) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        args = Arrays.copyOfRange(args, 1, args.length);
 
         for (String argument : args) {
             Character last = argument.charAt(argument.length() - 1);
             String number = argument.substring(0, argument.length() - 1);
 
-            // todo: find way to check if string is number without try/catch
-            try {
-                int value = Integer.parseInt(number);
+            if (pattern.matcher(number).matches() && timeKeys.containsKey(last)) {
+                break;
+            }
 
-                if (timeKeys.containsKey(last)) {
-                    break;
-                }
-            } catch (NumberFormatException ignored) {}
-
-            stringBuilder.append(stringBuilder.toString().equals("") ? "" : " ").append(argument);
+            reasonJoiner.add(argument);
         }
 
-        return stringBuilder.toString();
+        return new CommandArguments(
+            reasonJoiner.toString().isEmpty() ? null : reasonJoiner.toString(),
+            timeJoiner.toString().isEmpty() ? null : timeJoiner.toString()
+        );
     }
 
     private String[] reverseArray(String[] arr) {

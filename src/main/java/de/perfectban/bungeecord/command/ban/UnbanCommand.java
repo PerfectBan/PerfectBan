@@ -2,6 +2,7 @@ package de.perfectban.bungeecord.command.ban;
 
 import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.command.CommandArguments;
 import de.perfectban.command.CommandInterface;
 import de.perfectban.command.CommandParser;
 import de.perfectban.command.helper.BanCommandHelper;
@@ -43,7 +44,9 @@ public class UnbanCommand extends Command implements CommandInterface
         UUID moderator = getModerator(commandSender);
 
         // parse command arguments
-        String reason = commandParser.getReason(args);
+        CommandArguments arguments = commandParser.getArguments(args);
+
+        String reason = arguments.getReason();
 
         // try to unban player
         banCommandHelper.deleteBan(player, reason, moderator,
