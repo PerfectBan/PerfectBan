@@ -48,18 +48,23 @@ public class BanCommandHelper
                 return;
             }
 
-            // calculate until
-            long diff = timeManager.convertToMillis(time);
-            Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
-
             List<Ban> bans = repository.getBans(uuid);
 
             if (!bans.isEmpty()) {
                 callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
-                    new HashMap<>()
+                        ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
+                        new HashMap<>()
                 ));
                 return;
+            }
+
+            long diff = 0;
+            Timestamp until = new Timestamp(System.currentTimeMillis());
+
+            // check if diff is set
+            if (time != null && !time.isEmpty()) {
+                diff = timeManager.convertToMillis(time);
+                until = new Timestamp(System.currentTimeMillis() + diff);
             }
 
             // ban player
@@ -80,8 +85,8 @@ public class BanCommandHelper
             }
 
             callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CREATE),
-                    replacements
+                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CREATE),
+                replacements
             ));
 
             // check if player is online
@@ -91,8 +96,10 @@ public class BanCommandHelper
                 return;
             }
 
-            String banMessage = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
-                    replacements);
+            String banMessage = Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
+                replacements
+            );
 
             // kick player from server
             proxiedPlayer.disconnect(new TextComponent(banMessage));
@@ -122,7 +129,7 @@ public class BanCommandHelper
             Ban ban = bans.get(0);
 
             // soft delete ban
-            repository.deleteBan(ban.getId(), moderator);
+            repository.deleteBan(ban.getId(), moderator, reason);
 
             // broadcast to moderators
             HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
@@ -164,16 +171,16 @@ public class BanCommandHelper
 
             Ban ban = bans.get(0);
 
-            // calculate until
-            long diff = timeManager.convertToMillis(time);
+            long diff = 0;
+            Timestamp until = new Timestamp(System.currentTimeMillis());
 
-            if (diff > 0) {
-                Timestamp until = new Timestamp(System.currentTimeMillis() + diff);
-
-                repository.editBan(ban.getId(), reason, until, permanent, moderator);
-            } else {
-                repository.editBan(ban.getId(), reason, null, permanent, moderator);
+            // check if diff is set
+            if (time != null && !time.isEmpty()) {
+                diff = timeManager.convertToMillis(time);
+                until = new Timestamp(System.currentTimeMillis() + diff);
             }
+
+            repository.editBan(ban.getId(), reason, until, permanent, moderator);
 
             HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
 

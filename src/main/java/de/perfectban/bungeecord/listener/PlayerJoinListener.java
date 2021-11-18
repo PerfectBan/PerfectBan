@@ -40,7 +40,7 @@ public class PlayerJoinListener implements Listener
 
         // if not lifetime & until is smaller than current time, mark ban as inactive
         if (!ban.isLifetime() && ban.getUntil().getTime() <= now.getTime()) {
-            repository.deleteBan(ban.getId(), null);
+            repository.deleteBan(ban.getId(), null, null);
             return;
         }
 

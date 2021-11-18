@@ -22,6 +22,7 @@ public class PerfectBan extends Plugin
     private static PerfectBan instance;
 
     private EntityManager entityManager;
+    private SessionFactory sessionFactory;
 
     @Override
     public void onEnable() {
@@ -36,7 +37,7 @@ public class PerfectBan extends Plugin
         );
 
         Configuration configuration = new Configuration()
-                .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect")
+                .setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL57Dialect") // todo: add these back
                 .setProperty("hibernate.connection.driver_class", "com.mysql.jdbc.Driver")
                 .setProperty("hibernate.connection.url", databaseHost)
                 .setProperty("hibernate.connection.username", ConfigManager.getString(ConfigType.DATABASE, Config.DATABASE_USERNAME))
@@ -47,7 +48,7 @@ public class PerfectBan extends Plugin
                 .addAnnotatedClass(Mute.class)
                 .addAnnotatedClass(Blocklist.class);
 
-        SessionFactory sessionFactory = configuration.buildSessionFactory();
+        sessionFactory = configuration.buildSessionFactory();
         entityManager = sessionFactory.createEntityManager();
 
         // bungeecord start
