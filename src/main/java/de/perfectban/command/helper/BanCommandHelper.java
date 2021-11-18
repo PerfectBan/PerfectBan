@@ -9,6 +9,9 @@ import de.perfectban.meta.Config;
 import de.perfectban.meta.Placeholder;
 import de.perfectban.util.TimeManager;
 import de.perfectban.util.UUIDFetcher;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -77,9 +80,22 @@ public class BanCommandHelper
             }
 
             callback.accept(Placeholder.replace(
-                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CREATE),
-                replacements
+                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CREATE),
+                    replacements
             ));
+
+            // check if player is online
+            ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(player);
+
+            if (proxiedPlayer == null || !proxiedPlayer.isConnected()) {
+                return;
+            }
+
+            String banMessage = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
+                    replacements);
+
+            // kick player from server
+            proxiedPlayer.disconnect(new TextComponent(banMessage));
         });
     }
 

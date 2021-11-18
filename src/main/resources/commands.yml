@@ -2,10 +2,17 @@ ban:
   command: "ban"
   permission: "perfectban.ban.command"
   description: |
-    {PREFIX} /ban <Spieler> <Reason> <Time> -ip §7Ban a player
-    {PREFIX} /ban change <Spieler> <Reason> <Time> §7Change a players ban
-    {PREFIX} /ban delete <Spieler> <Reason>§7Pardon a player
-    {PREFIX} /ban info <Spieler> §7Get information of a players bans
+    {PREFIX} /ban <Player> <Reason> <Time> -ip §7Ban a player
+unban:
+  command: "unban"
+  permission: "perfectban.unban.command"
+  description: |
+    {PREFIX} /unban <Player> <Reason> §7Unban a player
+change_ban:
+  command: "changeban"
+  permission: "perfectban.changeban.command"
+  description: |
+    {PREFIX} /changeban <Player> <Reason> <Time> §7Change a players ban
 mute:
   command: "mute"
   permission: "perfectban.mute.command"
@@ -17,4 +24,4 @@ mute:
 check:
   command: "check"
   permission: "perfectban.check.command"
-  description: "{PREFIX} /check <Spieler> §7Check a players History"
+  description: "{PREFIX} /check <Player> §7Check a players History"

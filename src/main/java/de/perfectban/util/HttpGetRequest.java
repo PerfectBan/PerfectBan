@@ -6,15 +6,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class HttpGetRequest
 {
-    private final List<String> lines = new ArrayList<>();
     private final HashMap<String, Object> headers = new HashMap<>();
-    private String url;
+    private final String url;
     private String result;
 
     public HttpGetRequest(String url) {
@@ -23,16 +20,6 @@ public class HttpGetRequest
         this.headers.put("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
         this.headers.put("Cache-Control", "no-cache");
         this.headers.put("Accept", "*/*");
-    }
-
-    public HttpGetRequest withHeader(String key, Object value) {
-        this.headers.put(key, value);
-        return this;
-    }
-
-    public HttpGetRequest withQueryParameter(String key, Object value) {
-        this.url += (this.url.contains("?") ? "&" : "?") + key + "=" + value;
-        return this;
     }
 
     public HttpGetRequest send() throws IOException {
@@ -61,7 +48,6 @@ public class HttpGetRequest
         StringBuilder result = new StringBuilder();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
-            this.lines.add(line);
             result.append(line);
         }
         this.result = result.toString();
@@ -75,9 +61,5 @@ public class HttpGetRequest
         }
 
         return this.result;
-    }
-
-    public List<String> getAsLines() {
-        return lines;
     }
 }

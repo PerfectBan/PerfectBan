@@ -50,27 +50,28 @@ public class PlayerJoinListener implements Listener
         replacements.put(Placeholder.REASON, ban.getReason());
         replacements.put(Placeholder.PLAYER, event.getConnection().getName());
         replacements.put(
-                Placeholder.UNTIL,
-                ban.getUntil() == null
-                        ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
-                        : ban.getUntil().toLocalDateTime().toString()
+            Placeholder.UNTIL,
+            ban.getUntil() == null
+                ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
+                : ban.getUntil().toLocalDateTime().toString()
         );
         replacements.put(
-                Placeholder.BANNED_BY,
-                ban.getModerator() == null
-                        ? ConfigManager.getString(ConfigType.MESSAGES, Config.CONSOLE)
-                        : ban.getModerator()
+            Placeholder.BANNED_BY,
+            ban.getModerator() == null
+                ? ConfigManager.getString(ConfigType.MESSAGES, Config.CONSOLE)
+                : ban.getModerator()
         );
         replacements.put(
-                Placeholder.TIME_LEFT,
-                ban.isLifetime()
-                        ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
-                        : new TimeManager().convertToTimeString(ban.getUntil().getTime() - System.currentTimeMillis())
+            Placeholder.TIME_LEFT,
+            ban.isLifetime()
+                ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
+                : new TimeManager().convertToTimeString(ban.getUntil().getTime() - System.currentTimeMillis())
         );
 
-        String banMessage = Placeholder.replace(ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
-                replacements);
-
+        String banMessage = Placeholder.replace(
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
+            replacements
+        );
 
         // disallow player from joining
         event.setCancelled(true);
