@@ -1,4 +1,4 @@
-package de.perfectban.bungeecord.config;
+package de.perfectban.config;
 
 import de.perfectban.PerfectBan;
 import net.md_5.bungee.config.Configuration;

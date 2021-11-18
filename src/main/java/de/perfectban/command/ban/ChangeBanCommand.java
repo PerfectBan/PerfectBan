@@ -1,7 +1,7 @@
-package de.perfectban.bungeecord.command.ban;
+package de.perfectban.command.ban;
 
-import de.perfectban.bungeecord.config.ConfigManager;
-import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 import de.perfectban.command.CommandArguments;
 import de.perfectban.command.CommandInterface;
 import de.perfectban.command.CommandParser;
@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class BanCommand extends Command implements CommandInterface
+public class ChangeBanCommand extends Command implements CommandInterface
 {
     private final CommandParser commandParser;
     private final BanCommandHelper banCommandHelper;
 
-    public BanCommand(String name, String permission) {
+    public ChangeBanCommand(String name, String permission) {
         super(name, permission);
 
         this.commandParser = new CommandParser();
@@ -37,8 +37,7 @@ public class BanCommand extends Command implements CommandInterface
             return;
         }
 
-        // the action the user wants to execute
-        // none equals banning the player
+        // the name of the player
         String player = args[0];
 
         // the player/console that issued the action
@@ -53,9 +52,9 @@ public class BanCommand extends Command implements CommandInterface
         // if no time provided -> default to permanent
         boolean permanent = (time == null || time.isEmpty());
 
-        // try to ban player
-        banCommandHelper.ban(player, reason, time, permanent, moderator,
-                message -> commandSender.sendMessage(new TextComponent(message)));
+        // try to change ban
+        banCommandHelper.changeBan(player, reason, time, permanent, moderator,
+            message -> commandSender.sendMessage(new TextComponent(message)));
     }
 
     @Override
@@ -66,8 +65,8 @@ public class BanCommand extends Command implements CommandInterface
     @Override
     public String getDescription() {
         return Placeholder.replace(
-            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_BAN_DESCRIPTION),
-            new HashMap<>()
+                ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_CHANGE_BAN_DESCRIPTION),
+                new HashMap<>()
         );
     }
 
