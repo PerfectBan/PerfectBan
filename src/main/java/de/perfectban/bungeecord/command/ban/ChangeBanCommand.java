@@ -2,6 +2,7 @@ package de.perfectban.bungeecord.command.ban;
 
 import de.perfectban.bungeecord.config.ConfigManager;
 import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.command.CommandArguments;
 import de.perfectban.command.CommandInterface;
 import de.perfectban.command.CommandParser;
 import de.perfectban.command.helper.BanCommandHelper;
@@ -43,8 +44,10 @@ public class ChangeBanCommand extends Command implements CommandInterface
         UUID moderator = getModerator(commandSender);
 
         // parse command arguments
-        String reason = commandParser.getReason(args);
-        String time = commandParser.getTime(args);
+        CommandArguments arguments = commandParser.getArguments(args);
+
+        String reason = arguments.getReason();
+        String time = arguments.getTime();
 
         // if no time provided -> default to permanent
         boolean permanent = (time == null || time.isEmpty());
