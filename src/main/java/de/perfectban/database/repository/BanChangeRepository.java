@@ -6,6 +6,7 @@ import de.perfectban.database.entity.BanChange;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 public class BanChangeRepository
 {
@@ -15,7 +16,7 @@ public class BanChangeRepository
         this.entityManager = entityManager;
     }
 
-    public BanChange createChange(Ban ban, String reason, Timestamp until, Boolean lifetime, String moderator, String action) {
+    public BanChange createChange(Ban ban, String reason, Timestamp until, Boolean lifetime, UUID moderator, String action) {
         EntityTransaction transaction = entityManager.getTransaction();
 
         transaction.begin();
@@ -23,7 +24,7 @@ public class BanChangeRepository
         BanChange banChange = new BanChange();
 
         banChange.setBan(ban);
-        banChange.setModerator(moderator);
+        banChange.setModerator(moderator == null ? null : moderator.toString());
         banChange.setAction(action);
 
         banChange.setReasonFrom(ban.getReason());
