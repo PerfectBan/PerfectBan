@@ -1,5 +1,6 @@
 package de.perfectban.database.repository;
 
+import com.sun.istack.Nullable;
 import de.perfectban.database.entity.Ban;
 
 import javax.persistence.EntityManager;
@@ -48,9 +49,9 @@ public class BanRepository
         ban.setModerator(moderator == null ? null : moderator.toString());
 
         entityManager.persist(ban);
-        entityManager.flush();
 
         transaction.commit();
+        entityManager.close();
 
         return ban;
     }
@@ -77,15 +78,15 @@ public class BanRepository
             ban.setLifetime(lifetime);
         }
 
-        if (until != null) {
+        if (Boolean.FALSE.equals(lifetime) && until != null) {
             ban.setUntil(until);
         }
 
         transaction.commit();
-
+        entityManager.close();
     }
 
-    public void deleteBan(int id, UUID moderator) {
+    public void deleteBan(int id, @Nullable UUID moderator, String reason) {
         Ban ban = getBan(id);
 
         if (ban == null) {
@@ -94,7 +95,7 @@ public class BanRepository
 
         if (moderator != null) {
             BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
-            banChangeRepository.createChange(ban, null, null, null, (moderator == null ? null : moderator.toString()), "delete");
+            banChangeRepository.createChange(ban, reason, null, null, (moderator == null ? null : moderator.toString()), "delete");
         }
 
         EntityTransaction transaction = entityManager.getTransaction();
@@ -102,5 +103,6 @@ public class BanRepository
         transaction.begin();
         ban.setActive(false);
         transaction.commit();
+        entityManager.close();
     }
 }

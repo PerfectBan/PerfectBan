@@ -43,7 +43,6 @@ public class MuteRepository
         mute.setAutomatic(automatic);
 
         entityManager.persist(mute);
-        entityManager.flush();
 
         transaction.commit();
 

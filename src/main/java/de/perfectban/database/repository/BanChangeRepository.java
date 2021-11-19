@@ -36,7 +36,6 @@ public class BanChangeRepository
         banChange.setLifetimeTo(lifetime);
 
         entityManager.persist(banChange);
-        entityManager.flush();
 
         transaction.commit();
 

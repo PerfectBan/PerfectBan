@@ -1,7 +1,7 @@
-package de.perfectban.bungeecord.command.ban;
+package de.perfectban.command.ban;
 
-import de.perfectban.bungeecord.config.ConfigManager;
-import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 import de.perfectban.command.CommandArguments;
 import de.perfectban.command.CommandInterface;
 import de.perfectban.command.CommandParser;

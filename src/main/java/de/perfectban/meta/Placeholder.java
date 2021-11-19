@@ -1,7 +1,7 @@
 package de.perfectban.meta;
 
-import de.perfectban.bungeecord.config.ConfigManager;
-import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 
 import java.util.HashMap;
 

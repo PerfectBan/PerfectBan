@@ -1,8 +1,8 @@
-package de.perfectban.bungeecord.listener;
+package de.perfectban.listener;
 
 import de.perfectban.PerfectBan;
-import de.perfectban.bungeecord.config.ConfigManager;
-import de.perfectban.bungeecord.config.ConfigType;
+import de.perfectban.config.ConfigManager;
+import de.perfectban.config.ConfigType;
 import de.perfectban.database.entity.Ban;
 import de.perfectban.database.repository.BanRepository;
 import de.perfectban.meta.Config;
@@ -40,7 +40,7 @@ public class PlayerJoinListener implements Listener
 
         // if not lifetime & until is smaller than current time, mark ban as inactive
         if (!ban.isLifetime() && ban.getUntil().getTime() <= now.getTime()) {
-            repository.deleteBan(ban.getId(), null);
+            repository.deleteBan(ban.getId(), null, null);
             return;
         }
 
