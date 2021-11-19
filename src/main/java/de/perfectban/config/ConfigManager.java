@@ -27,7 +27,18 @@ public class ConfigManager
     }
 
     public static boolean getBoolean(ConfigType configType, String key) {
-        return Boolean.getBoolean(getObject(configType, key).toString());
+        Configuration configuration = getConfig(configType, false);
+        Configuration defaultConfiguration = getConfig(configType, true);
+
+        if (configuration != null) {
+            return configuration.getBoolean(key);
+        }
+
+        if (defaultConfiguration != null) {
+            return defaultConfiguration.getBoolean(key);
+        }
+
+        return false;
     }
 
     public static int getInteger(ConfigType configType, String key) {

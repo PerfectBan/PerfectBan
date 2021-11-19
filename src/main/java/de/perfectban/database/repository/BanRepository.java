@@ -51,7 +51,6 @@ public class BanRepository
         entityManager.persist(ban);
 
         transaction.commit();
-        entityManager.close();
 
         return ban;
     }
@@ -83,7 +82,6 @@ public class BanRepository
         }
 
         transaction.commit();
-        entityManager.close();
     }
 
     public void deleteBan(int id, @Nullable UUID moderator, String reason) {
@@ -101,6 +99,5 @@ public class BanRepository
         transaction.begin();
         ban.setActive(false);
         transaction.commit();
-        entityManager.close();
     }
 }

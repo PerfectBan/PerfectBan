@@ -1,5 +1,6 @@
 package de.perfectban.command.ban;
 
+import de.perfectban.command.CommandAction;
 import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.command.CommandArguments;
@@ -37,24 +38,19 @@ public class ChangeBanCommand extends Command implements CommandInterface
             return;
         }
 
-        // the name of the player
-        String player = args[0];
-
-        // the player/console that issued the action
-        UUID moderator = getModerator(commandSender);
-
         // parse command arguments
         CommandArguments arguments = commandParser.getArguments(args);
 
-        String reason = arguments.getReason();
-        String time = arguments.getTime();
+        arguments.setPermanent(arguments.getTime() == null || arguments.getTime().isEmpty());
 
-        // if no time provided -> default to permanent
-        boolean permanent = (time == null || time.isEmpty());
+        // the player/console that issued the action
+        arguments.setModerator(getModerator(commandSender));
+
+        // the name of the player
+        arguments.setPlayer(args[0]);
 
         // try to change ban
-        banCommandHelper.changeBan(player, reason, time, permanent, moderator,
-            message -> commandSender.sendMessage(new TextComponent(message)));
+        banCommandHelper.execute(CommandAction.UPDATE, arguments, commandSender::sendMessage);
     }
 
     @Override
@@ -65,8 +61,8 @@ public class ChangeBanCommand extends Command implements CommandInterface
     @Override
     public String getDescription() {
         return Placeholder.replace(
-                ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_CHANGE_BAN_DESCRIPTION),
-                new HashMap<>()
+            ConfigManager.getString(ConfigType.COMMANDS, Config.COMMAND_CHANGE_BAN_DESCRIPTION),
+            new HashMap<>()
         );
     }
 

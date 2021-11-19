@@ -1,5 +1,6 @@
 package de.perfectban.command.ban;
 
+import de.perfectban.command.CommandAction;
 import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.command.CommandArguments;
@@ -37,25 +38,23 @@ public class BanCommand extends Command implements CommandInterface
             return;
         }
 
-        // the action the user wants to execute
-        // none equals banning the player
-        String player = args[0];
-
         // the player/console that issued the action
         UUID moderator = getModerator(commandSender);
 
         // parse command arguments
         CommandArguments arguments = commandParser.getArguments(args);
 
-        String reason = arguments.getReason();
-        String time = arguments.getTime();
-
         // if no time provided -> default to permanent
-        boolean permanent = (time == null || time.isEmpty());
+        arguments.setPermanent(arguments.getTime() == null || arguments.getTime().isEmpty());
+
+        // add player name to command arguments
+        arguments.setPlayer(args[0]);
+
+        // add the moderator to the arguments
+        arguments.setModerator(moderator);
 
         // try to ban player
-        banCommandHelper.ban(player, reason, time, permanent, moderator,
-                message -> commandSender.sendMessage(new TextComponent(message)));
+        banCommandHelper.execute(CommandAction.CREATE, arguments, commandSender::sendMessage);
     }
 
     @Override
