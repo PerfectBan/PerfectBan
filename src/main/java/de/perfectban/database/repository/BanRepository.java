@@ -64,7 +64,7 @@ public class BanRepository
         }
 
         BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
-        banChangeRepository.createChange(ban, reason, until, lifetime, (moderator == null ? null : moderator.toString()), "edit");
+        banChangeRepository.createChange(ban, reason, until, lifetime, moderator, "edit");
 
         EntityTransaction transaction = entityManager.getTransaction();
 
@@ -93,10 +93,8 @@ public class BanRepository
             return;
         }
 
-        if (moderator != null) {
-            BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
-            banChangeRepository.createChange(ban, reason, null, null, (moderator == null ? null : moderator.toString()), "delete");
-        }
+        BanChangeRepository banChangeRepository = new BanChangeRepository(entityManager);
+        banChangeRepository.createChange(ban, reason, null, null, moderator, "delete");
 
         EntityTransaction transaction = entityManager.getTransaction();
 
