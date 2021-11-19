@@ -1,12 +1,22 @@
 package de.perfectban.command;
 
+import java.util.UUID;
+
 public class CommandArguments
 {
-    private String reason, time;
+    private String player, reason, time;
+    private boolean permanent;
+    private UUID moderator;
 
-    public CommandArguments(String reason, String time) {
-        this.reason = reason;
-        this.time = time;
+    public CommandArguments() {}
+
+    public String getPlayer() {
+        return player;
+    }
+
+    public CommandArguments setPlayer(String player) {
+        this.player = player;
+        return this;
     }
 
     public String getReason() {
@@ -24,6 +34,24 @@ public class CommandArguments
 
     public CommandArguments setTime(String time) {
         this.time = time;
+        return this;
+    }
+
+    public boolean isPermanent() {
+        return permanent;
+    }
+
+    public CommandArguments setPermanent(boolean permanent) {
+        this.permanent = permanent;
+        return this;
+    }
+
+    public UUID getModerator() {
+        return moderator;
+    }
+
+    public CommandArguments setModerator(UUID moderator) {
+        this.moderator = moderator;
         return this;
     }
 }

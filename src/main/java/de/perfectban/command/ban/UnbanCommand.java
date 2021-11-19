@@ -1,5 +1,6 @@
 package de.perfectban.command.ban;
 
+import de.perfectban.command.CommandAction;
 import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.command.CommandArguments;
@@ -37,20 +38,17 @@ public class UnbanCommand extends Command implements CommandInterface
             return;
         }
 
-        // the name of the player
-        String player = args[0];
-
-        // the player/console that issued the action
-        UUID moderator = getModerator(commandSender);
-
         // parse command arguments
         CommandArguments arguments = commandParser.getArguments(args);
 
-        String reason = arguments.getReason();
+        // the name of the player
+        arguments.setPlayer(args[0]);
+
+        // the player/console that issued the action
+        arguments.setModerator(getModerator(commandSender));
 
         // try to unban player
-        banCommandHelper.deleteBan(player, reason, moderator,
-            message -> commandSender.sendMessage(new TextComponent(message)));
+        banCommandHelper.execute(CommandAction.DELETE, arguments, commandSender::sendMessage);
     }
 
     @Override

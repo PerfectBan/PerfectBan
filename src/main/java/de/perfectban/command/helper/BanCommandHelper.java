@@ -1,6 +1,8 @@
 package de.perfectban.command.helper;
 
 import de.perfectban.PerfectBan;
+import de.perfectban.command.CommandAction;
+import de.perfectban.command.CommandArguments;
 import de.perfectban.config.ConfigManager;
 import de.perfectban.config.ConfigType;
 import de.perfectban.database.entity.Ban;
@@ -29,208 +31,226 @@ public class BanCommandHelper
         this.timeManager = new TimeManager();
     }
 
-    public void ban(String player, String reason, String time, boolean permanent, UUID moderator, Consumer<String> callback) {
-        UUIDFetcher.getUUIDbyName(player, uuid -> {
+    public void execute(CommandAction commandAction, CommandArguments arguments, Consumer<TextComponent> callback) {
+        UUIDFetcher.getUUIDbyName(arguments.getPlayer(), uuid -> {
             if (uuid == null) {
-                callback.accept(Placeholder.replace(
+                callback.accept(new TextComponent(Placeholder.replace(
                     ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
                     new HashMap<>()
-                ));
+                )));
                 return;
             }
 
-            // check if reason is set
-            if (reason == null || reason.isEmpty()) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_REASON),
-                    new HashMap<>()
-                ));
-                return;
+            if (commandAction == CommandAction.CREATE) {
+                ban(uuid, arguments, response -> callback.accept(new TextComponent(response)));
+            } else if (commandAction == CommandAction.READ) {
+                info(uuid, arguments.getPlayer(), response -> callback.accept(new TextComponent(response)));
+            } else if (commandAction == CommandAction.UPDATE) {
+                update(uuid, arguments, response -> callback.accept(new TextComponent(response)));
+            } else if (commandAction == CommandAction.DELETE) {
+                delete(uuid, arguments, response -> callback.accept(new TextComponent(response)));
             }
+        });
+    }
 
-            List<Ban> bans = repository.getBans(uuid);
-
-            if (!bans.isEmpty()) {
-                callback.accept(Placeholder.replace(
-                        ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
-                        new HashMap<>()
-                ));
-                return;
-            }
-
-            long diff = 0;
-            Timestamp until = new Timestamp(System.currentTimeMillis());
-
-            // check if diff is set
-            if (time != null && !time.isEmpty()) {
-                diff = timeManager.convertToMillis(time);
-                until = new Timestamp(System.currentTimeMillis() + diff);
-            }
-
-            // ban player
-            Ban ban = repository.createBan(uuid, reason, until, permanent, false, moderator);
-
-            HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
-
-            if (diff > 0) {
-                replacements.put(Placeholder.TIME_LEFT, timeManager.convertToTimeString(diff));
-            }
-
-            if (ConfigManager.getBoolean(ConfigType.CONFIG, Config.USE_BROADCAST)) {
-                String message = Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CREATE),
-                    replacements
-                );
-                // todo: broadcast
-            }
-
+    private void ban(UUID uuid, CommandArguments arguments, Consumer<String> callback) {
+        if (uuid == null) {
             callback.accept(Placeholder.replace(
-                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CREATE),
-                replacements
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                new HashMap<>()
             ));
+            return;
+        }
 
-            // check if player is online
-            ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(player);
+        // check if reason is set
+        if (arguments.getReason() == null || arguments.getReason().isEmpty()) {
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_REASON),
+                new HashMap<>()
+            ));
+            return;
+        }
 
-            if (proxiedPlayer == null || !proxiedPlayer.isConnected()) {
-                return;
-            }
+        List<Ban> bans = repository.getBans(uuid);
 
-            String banMessage = Placeholder.replace(
-                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
+        if (!bans.isEmpty()) {
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_BANNED),
+                new HashMap<>()
+            ));
+            return;
+        }
+
+        long diff = 0;
+        Timestamp until = new Timestamp(System.currentTimeMillis());
+
+        // check if diff is set
+        if (arguments.getTime() != null && !arguments.getTime().isEmpty()) {
+            diff = timeManager.convertToMillis(arguments.getTime());
+            until = new Timestamp(System.currentTimeMillis() + diff);
+        }
+
+        // ban player
+        Ban ban = repository.createBan(uuid, arguments.getReason(), until, arguments.isPermanent(), false, arguments.getModerator());
+
+        HashMap<Placeholder, Object> replacements = getBanReplacements(arguments.getPlayer(), ban);
+
+        if (diff > 0) {
+            replacements.put(Placeholder.TIME_LEFT, timeManager.convertToTimeString(diff));
+        }
+
+        if (ConfigManager.getBoolean(ConfigType.CONFIG, Config.USE_BROADCAST)) {
+            String message = Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CREATE),
+                replacements
+            );
+            PerfectBan.getInstance().getProxy().broadcast(new TextComponent(message));
+        }
+
+        callback.accept(Placeholder.replace(
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CREATE),
+            replacements
+        ));
+
+        // check if player is online
+        ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(arguments.getPlayer());
+
+        if (proxiedPlayer == null || !proxiedPlayer.isConnected()) {
+            return;
+        }
+
+        String banMessage = Placeholder.replace(
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_MESSAGE),
+            replacements
+        );
+
+        // kick player from server
+        proxiedPlayer.disconnect(new TextComponent(banMessage));
+    }
+
+    private void delete(UUID uuid, CommandArguments arguments, Consumer<String> callback) {
+        if (uuid == null) {
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                new HashMap<>()
+            ));
+            return;
+        }
+
+        List<Ban> bans = repository.getBans(uuid);
+
+        if (bans.isEmpty()) {
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
+                new HashMap<>()
+            ));
+            return;
+        }
+
+        Ban ban = bans.get(0);
+
+        // soft delete ban
+        repository.deleteBan(ban.getId(), arguments.getModerator(), arguments.getReason());
+
+        // broadcast to moderators
+        HashMap<Placeholder, Object> replacements = getBanReplacements(arguments.getPlayer(), ban);
+
+        replacements.put(Placeholder.REASON, arguments.getReason() == null ? "N/A" : arguments.getReason());
+
+        if (ConfigManager.getBoolean(ConfigType.CONFIG, Config.USE_BROADCAST)) {
+            String message = Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE),
+                replacements
+            );
+            ProxyServer.getInstance().broadcast(new TextComponent(message));
+        }
+
+        callback.accept(Placeholder.replace(
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_DELETE),
+            replacements
+        ));
+    }
+
+    private void update(UUID uuid, CommandArguments arguments, Consumer<String> callback) {
+        if (uuid == null) {
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                new HashMap<>()
+            ));
+            return;
+        }
+
+        List<Ban> bans = repository.getBans(uuid);
+
+        if (bans.isEmpty()) {
+            callback.accept(Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
+                new HashMap<>()
+            ));
+            return;
+        }
+
+        Ban ban = bans.get(0);
+
+        long diff = 0;
+        Timestamp until = new Timestamp(System.currentTimeMillis());
+
+        // check if diff is set
+        if (arguments.getTime() != null && !arguments.getTime().isEmpty()) {
+            diff = timeManager.convertToMillis(arguments.getTime());
+            until = new Timestamp(System.currentTimeMillis() + diff);
+        }
+
+        repository.editBan(ban.getId(), arguments.getReason(), until, arguments.isPermanent(), arguments.getModerator());
+
+        HashMap<Placeholder, Object> replacements = getBanReplacements(arguments.getPlayer(), ban);
+
+        replacements.put(Placeholder.REASON, arguments.getReason() == null ? "N/A" : arguments.getReason());
+
+        if (diff > 0) {
+            replacements.put(Placeholder.TIME_LEFT, timeManager.convertToTimeString(diff));
+        }
+
+        // broadcast to moderators
+        if (ConfigManager.getBoolean(ConfigType.CONFIG, Config.USE_BROADCAST)) {
+            String message = Placeholder.replace(
+                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CHANGE),
                 replacements
             );
 
-            // kick player from server
-            proxiedPlayer.disconnect(new TextComponent(banMessage));
-        });
+            ProxyServer.getInstance().broadcast(new TextComponent(message));
+        }
+
+        callback.accept(Placeholder.replace(
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CHANGE),
+            replacements
+        ));
     }
 
-    public void deleteBan(String player, String reason, UUID moderator, Consumer<String> callback) {
-        UUIDFetcher.getUUIDbyName(player, uuid -> {
-            if (uuid == null) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
-                    new HashMap<>()
-                ));
-                return;
-            }
-
-            List<Ban> bans = repository.getBans(uuid);
-
-            if (bans.isEmpty()) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
-                    new HashMap<>()
-                ));
-                return;
-            }
-
-            Ban ban = bans.get(0);
-
-            // soft delete ban
-            repository.deleteBan(ban.getId(), moderator, reason);
-
-            // broadcast to moderators
-            HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
-
-            if (ConfigManager.getBoolean(ConfigType.CONFIG, Config.USE_BROADCAST)) {
-                String message = Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_DELETE),
-                    replacements
-                );
-                // todo: broadcast
-            }
-
+    private void info(UUID uuid, String player, Consumer<String> callback) {
+        if (uuid == null) {
             callback.accept(Placeholder.replace(
-                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_DELETE),
-                replacements
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
+                new HashMap<>()
             ));
-        });
-    }
+            return;
+        }
 
-    public void changeBan(String player, String reason, String time, boolean permanent, UUID moderator, Consumer<String> callback) {
-        UUIDFetcher.getUUIDbyName(player, uuid -> {
-            if (uuid == null) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
-                    new HashMap<>()
-                ));
-                return;
-            }
+        List<Ban> bans = repository.getBans(uuid);
 
-            List<Ban> bans = repository.getBans(uuid);
-
-            if (bans.isEmpty()) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
-                    new HashMap<>()
-                ));
-                return;
-            }
-
-            Ban ban = bans.get(0);
-
-            long diff = 0;
-            Timestamp until = new Timestamp(System.currentTimeMillis());
-
-            // check if diff is set
-            if (time != null && !time.isEmpty()) {
-                diff = timeManager.convertToMillis(time);
-                until = new Timestamp(System.currentTimeMillis() + diff);
-            }
-
-            repository.editBan(ban.getId(), reason, until, permanent, moderator);
-
-            HashMap<Placeholder, Object> replacements = getBanReplacements(player, ban);
-
-            if (diff > 0) {
-                replacements.put(Placeholder.TIME_LEFT, timeManager.convertToTimeString(diff));
-            }
-
-            // broadcast to moderators
-            if (ConfigManager.getBoolean(ConfigType.CONFIG, Config.USE_BROADCAST)) {
-                String message = Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BROADCAST_CHANGE),
-                    replacements
-                );
-
-                // todo: broadcast
-            }
-
+        // todo: history
+        if (bans.isEmpty()) {
             callback.accept(Placeholder.replace(
-                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_CHANGE),
-                replacements
+                ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
+                new HashMap<>()
             ));
-        });
-    }
+            return;
+        }
 
-    public void banInfo(String player, Consumer<String> callback) {
-        UUIDFetcher.getUUIDbyName(player, uuid -> {
-            if (uuid == null) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_PLAYER_NOT_FOUND),
-                    new HashMap<>()
-                ));
-                return;
-            }
-
-            List<Ban> bans = repository.getBans(uuid);
-
-            // todo: history
-            if (bans.isEmpty()) {
-                callback.accept(Placeholder.replace(
-                    ConfigManager.getString(ConfigType.MESSAGES, Config.ERROR_BAN_PLAYER_NOT_BANNED),
-                    new HashMap<>()
-                ));
-                return;
-            }
-
-            callback.accept(Placeholder.replace(
-                ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_INFO),
-                getBanReplacements(player, bans.get(0))
-            ));
-        });
+        callback.accept(Placeholder.replace(
+            ConfigManager.getString(ConfigType.MESSAGES, Config.BAN_COMMAND_BAN_INFO),
+            getBanReplacements(player, bans.get(0))
+        ));
     }
 
     private HashMap<Placeholder, Object> getBanReplacements(String player, Ban ban) {

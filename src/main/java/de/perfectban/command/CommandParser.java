@@ -50,10 +50,14 @@ public class CommandParser
             timeJoiner.add(argument);
         }
 
-        return new CommandArguments(
-            reasonJoiner.toString().isEmpty() ? null : reasonJoiner.toString(),
-            timeJoiner.toString().isEmpty() ? null : timeJoiner.toString()
-        );
+
+
+        CommandArguments commandArguments = new CommandArguments();
+
+        commandArguments.setReason(reasonJoiner.toString().isEmpty() ? null : reasonJoiner.toString());
+        commandArguments.setTime(timeJoiner.toString().isEmpty() ? null : timeJoiner.toString());
+
+        return commandArguments;
     }
 
     private String[] reverseArray(String[] arr) {
