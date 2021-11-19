@@ -46,4 +46,6 @@ public class Config
 
     // SETTINGS
     public static final String USE_BROADCAST = "broadcast.use";
+    public static final String DATE_TIME_FORMAT = "datetime_format";
+    public static final String DATE_FORMAT = "date_format";
 }

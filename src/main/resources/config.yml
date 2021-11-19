@@ -1,2 +1,4 @@
 broadcast:
   use: true
+datetime_format: "dd. MMM yyyy hh:mm:ss"
+date_format: "dd. MMM yyyy"

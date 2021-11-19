@@ -16,6 +16,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -259,10 +261,11 @@ public class BanCommandHelper
         replacements.put(Placeholder.REASON, ban.getReason());
         replacements.put(Placeholder.PLAYER, player);
         replacements.put(
-                Placeholder.UNTIL,
-                ban.getUntil() == null
-                    ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
-                    : ban.getUntil().toLocalDateTime().toString()
+            Placeholder.UNTIL,
+            ban.getUntil() == null
+                ? ConfigManager.getString(ConfigType.MESSAGES, Config.PERMANENT)
+                : new SimpleDateFormat(ConfigManager.getString(ConfigType.CONFIG, Config.DATE_TIME_FORMAT))
+                    .format(new Date(ban.getUntil().getTime()))
         );
         replacements.put(
             Placeholder.BANNED_BY,

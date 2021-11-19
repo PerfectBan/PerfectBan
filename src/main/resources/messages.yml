@@ -25,6 +25,7 @@ ban:
       delete: |
         {PREFIX} {BANNED_BY} deleted ban of §e{PLAYER}
         {PREFIX} Reason: §e{REASON}
+
     info: |
       {PREFIX} Information about §e{PLAYER}
       {PREFIX} §8=========================
@@ -34,18 +35,15 @@ ban:
       {PREFIX} Time left: §e{TIME_LEFT}
       {PREFIX} Moderator: §e{BANNED_BY}
     create: |
-      {PREFIX} Succesfully banned §e{PLAYER}
-      {PREFIX} Reason: §e{REASON} §f- Time: {TIME_LEFT}
+      {PREFIX} Succesfully §fbanned §e§l{PLAYER}
     change: |
-      {PREFIX} Succesfully changed ban of §e{PLAYER}
-      {PREFIX} Reason: §e{REASON} §f- Time: {TIME_LEFT}
+      {PREFIX} Succesfully §fchanged ban of §e§l{PLAYER}
     delete: |
-      {PREFIX} Succesfully deleted ban of §e{PLAYER}
-      {PREFIX} Reason: §e{REASON}
+      {PREFIX} Succesfully §fdeleted ban of §e§l{PLAYER}
 
 error:
-  player_not_found: "{PREFIX} §cThis player has not been found"
+  player_not_found: "{PREFIX} §e§l{PLAYER} §cis not a valid player"
   ban:
-    player_not_banned: "{PREFIX} §cThis player is not banned"
-    player_banned: "{PREFIX} §cThis player is already banned"
-    reason_required: "{PREFIX} §cYou have to provide a reason to create a ban"
+    player_not_banned: "{PREFIX} §e§l{PLAYER} §cis not banned"
+    player_banned: "{PREFIX} §e§l{PLAYER} §cis already banned"
+    reason_required: "{PREFIX} §e§l{REASON} §cis not a valid reason"
